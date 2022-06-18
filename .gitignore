@@ -1,0 +1,10 @@
+.DS_Store
+
+xcuserdata/
+.build/
+*.ipa
+*.zip
+system_logs.logarchive/
+
+fastlane/**/*.html
+report.xml
