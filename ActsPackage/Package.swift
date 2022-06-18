@@ -14,6 +14,8 @@ let package = Package(
     ],
     dependencies: [],
     targets: [
-        .target(name: "App", dependencies: []),
+        .target(name: "App", dependencies: ["SignInFeature"]),
+        .target(name: "SignInFeature", dependencies: ["Core"]),
+        .target(name: "Core")
     ]
 )
