@@ -12,10 +12,18 @@ let package = Package(
             targets: ["App"]
         ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-async-algorithms", branch: "swift-5.6")
+    ],
     targets: [
         .target(name: "App", dependencies: ["SignInFeature"]),
-        .target(name: "SignInFeature", dependencies: ["Core"]),
+        .target(
+            name: "SignInFeature",
+            dependencies: [
+                "Core",
+                .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
+            ]
+        ),
         .target(name: "Core")
     ]
 )
