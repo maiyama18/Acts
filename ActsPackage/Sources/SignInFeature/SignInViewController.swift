@@ -1,10 +1,12 @@
 import UIKit
+import AuthenticationServices
 import Core
 
 public final class SignInViewController: UIViewController {
     private let viewModel: SignInViewModel
     private var eventSubscription: Task<Void, Never>?
     
+    @MainActor
     public init() {
         viewModel = .init()
         
@@ -27,13 +29,34 @@ public final class SignInViewController: UIViewController {
     }
     
     private func subscribe() {
-        eventSubscription = Task { [events = viewModel.events] in
-            for await event in events {
+        eventSubscription = Task { [weak self] in
+            guard let self = self else { return }
+            for await event in self.viewModel.events {
                 switch event {
-                case .startAuth:
-                    print("Start Auth")
+                case .startAuth(let url):
+                    let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "acts") { callbackURL, error in
+                        if let error = error {
+                            print("Failed to authenticate: \(error)")
+                            return
+                        }
+                        guard let callbackURL = callbackURL else {
+                            print("Failed to authenticate: callbackURL is nil")
+                            return
+                        }
+                        self.viewModel.execute(.callBackReceived(url: callbackURL))
+                    }
+                    session.presentationContextProvider = self
+                    session.start()
+                case .showError(let message):
+                    Dialogs.showSimpleError(from: self, message: message)
                 }
             }
         }
+    }
+}
+
+extension SignInViewController: ASWebAuthenticationPresentationContextProviding {
+    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        view.window!
     }
 }

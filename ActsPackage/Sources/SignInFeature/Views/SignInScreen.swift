@@ -1,13 +1,17 @@
 import SwiftUI
 
 struct SignInScreen: View {
-    var viewModel: SignInViewModel
+    @ObservedObject var viewModel: SignInViewModel
     
     var body: some View {
-        Button(action: {
-            viewModel.execute(.signInButtonTapped)
-        }) {
-            Text("Sign In with GitHub")
+        VStack {
+            Button(action: {
+                viewModel.execute(.signInButtonTapped)
+            }) {
+                Text("Sign In with GitHub")
+            }
+            
+            Text("code: \(viewModel.code ?? "nil")")
         }
     }
 }

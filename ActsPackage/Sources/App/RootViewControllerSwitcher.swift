@@ -1,6 +1,7 @@
 import UIKit
 import SignInFeature
 
+@MainActor
 public final class RootViewControllerSwitcher {
     private let window: UIWindow
     
