@@ -11,6 +11,7 @@
 		38784351285DB81600B046AD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38784350285DB81600B046AD /* SceneDelegate.swift */; };
 		38784358285DB81700B046AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38784357285DB81700B046AD /* Assets.xcassets */; };
 		3878435B285DB81700B046AD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38784359285DB81700B046AD /* LaunchScreen.storyboard */; };
+		38784364285DBC8A00B046AD /* App in Frameworks */ = {isa = PBXBuildFile; productRef = 38784363285DBC8A00B046AD /* App */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38784364285DBC8A00B046AD /* App in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +40,7 @@
 			children = (
 				3878434D285DB81600B046AD /* Acts */,
 				3878434C285DB81600B046AD /* Products */,
+				38784362285DBC8A00B046AD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,6 +64,13 @@
 			path = Acts;
 			sourceTree = "<group>";
 		};
+		38784362285DBC8A00B046AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -77,6 +87,9 @@
 			dependencies = (
 			);
 			name = Acts;
+			packageProductDependencies = (
+				38784363285DBC8A00B046AD /* App */,
+			);
 			productName = Acts;
 			productReference = 3878434B285DB81600B046AD /* Acts.app */;
 			productType = "com.apple.product-type.application";
@@ -342,6 +355,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		38784363285DBC8A00B046AD /* App */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = App;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 38784343285DB81600B046AD /* Project object */;
 }

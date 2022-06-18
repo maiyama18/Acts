@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import App
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -13,9 +14,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        let viewController = UIViewController()
-        viewController.view.backgroundColor = .systemOrange
-        window.rootViewController = viewController
+        window.rootViewController = SignInViewController()
         self.window = window
         window.makeKeyAndVisible()
     }
