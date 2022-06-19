@@ -11,18 +11,18 @@ public protocol SecureStorageProtocol {
 
 public final class SecureStorage: SecureStorageProtocol {
     public static let shared: SecureStorage = .init()
-    
+
     private init() {}
-    
+
     public func getToken() -> String? {
-         try? keychain.get(tokenKey)
+        try? keychain.get(tokenKey)
     }
-    
-    public func saveToken(token: String) throws -> Void {
+
+    public func saveToken(token: String) throws {
         try keychain.set(token, key: tokenKey)
     }
-    
-    public func removeToken() throws -> Void {
-         try keychain.remove(tokenKey)
+
+    public func removeToken() throws {
+        try keychain.remove(tokenKey)
     }
 }

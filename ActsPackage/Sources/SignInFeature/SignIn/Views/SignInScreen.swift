@@ -1,9 +1,9 @@
-import SwiftUI
 import PKHUD
+import SwiftUI
 
 struct SignInScreen: View {
     @ObservedObject var viewModel: SignInViewModel
-    
+
     var body: some View {
         VStack {
             Button(action: {

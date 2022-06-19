@@ -1,7 +1,7 @@
 import UIKit
 
-extension UIView {
-    public func pinEdgesToSuperView() {
+public extension UIView {
+    func pinEdgesToSuperView() {
         guard let view = superview else {
             return
         }

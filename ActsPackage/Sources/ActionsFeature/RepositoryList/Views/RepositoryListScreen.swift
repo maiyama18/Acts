@@ -1,9 +1,9 @@
-import SwiftUI
 import PKHUD
+import SwiftUI
 
 struct RepositoryListScreen: View {
     @ObservedObject var viewModel: RepositoryListViewModel
-    
+
     var body: some View {
         VStack {
             Button(action: {
@@ -13,7 +13,7 @@ struct RepositoryListScreen: View {
             }) {
                 Text("Sign Out from GitHub")
             }
-            
+
             List {
                 ForEach(viewModel.repositories) { repository in
                     Text(repository.name)

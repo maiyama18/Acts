@@ -1,5 +1,5 @@
-import SwiftUI
 import PKHUD
+import SwiftUI
 
 public extension View {
     func progressHUD(showing: Bool) -> some View {

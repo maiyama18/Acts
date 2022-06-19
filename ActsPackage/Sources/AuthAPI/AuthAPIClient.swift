@@ -8,9 +8,9 @@ public protocol AuthAPIClientProtocol {
 
 public final class AuthAPIClient: AuthAPIClientProtocol {
     public static let shared: AuthAPIClient = .init()
-    
-    private init () {}
-    
+
+    private init() {}
+
     public func fetchAccessToken(code: String) async throws -> String {
         var request = URLRequest(url: authAPIURL)
         request.httpMethod = "POST"
@@ -20,7 +20,7 @@ public final class AuthAPIClient: AuthAPIClientProtocol {
         } catch {
             throw AuthAPIError.unexpectedError
         }
-        
+
         let data: Data
         let response: URLResponse
         do {
@@ -28,7 +28,7 @@ public final class AuthAPIClient: AuthAPIClientProtocol {
         } catch {
             throw AuthAPIError.disconnected
         }
-        
+
         guard let response = response as? HTTPURLResponse else {
             throw AuthAPIError.unexpectedError
         }
@@ -41,7 +41,7 @@ public final class AuthAPIClient: AuthAPIClientProtocol {
             }
             throw AuthAPIError.authFailed(message: response.message)
         }
-        
+
         do {
             let response = try JSONDecoder().decode(AuthResponse.self, from: data)
             return response.token

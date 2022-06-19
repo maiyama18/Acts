@@ -1,6 +1,6 @@
 struct AuthRequest: Codable {
     var code: String
-    
+
     init(code: String) {
         self.code = code
     }

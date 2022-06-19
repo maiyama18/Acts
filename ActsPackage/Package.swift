@@ -48,6 +48,6 @@ let package = Package(
                 .product(name: "KeychainAccess", package: "KeychainAccess"),
                 .product(name: "PKHUD", package: "PKHUD"),
             ]
-        )
+        ),
     ]
 )

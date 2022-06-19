@@ -5,8 +5,8 @@
 //  Created by maiyama on 2022/06/18.
 //
 
-import UIKit
 import PKHUD
+import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_: UIApplication, didDiscardSceneSessions _: Set<UISceneSession>) {}
-    
+
     private func setupHUD() {
         PKHUD.sharedHUD.gracePeriod = 0.3
     }

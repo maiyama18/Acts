@@ -1,5 +1,5 @@
 import Foundation
 
-extension Notification.Name {
-    public static let didChangeAuthState = Notification.Name("didChangeAuthState")
+public extension Notification.Name {
+    static let didChangeAuthState = Notification.Name("didChangeAuthState")
 }
