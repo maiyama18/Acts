@@ -7,7 +7,7 @@ public final class RepositoryListViewController: UIViewController {
     
     @MainActor
     public init() {
-        viewModel = .init(secureStorage: .live)
+        viewModel = .init(secureStorage: SecureStorage.shared)
         
         super.init(nibName: nil, bundle: nil)
     }

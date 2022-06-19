@@ -6,7 +6,7 @@ import ActionsFeature
 @MainActor
 public final class RootViewControllerSwitcher {
     private let window: UIWindow
-    private let secureStorage: SecureStorage = .live
+    private let secureStorage: SecureStorage = .shared
     
     public init(window: UIWindow) {
         self.window = window

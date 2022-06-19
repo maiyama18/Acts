@@ -19,12 +19,12 @@ final class SignInViewModel: ObservableObject {
     
     let events: AsyncChannel<Event> = .init()
     
-    private let authAPIClient: AuthAPIClient
-    private let secureStorage: SecureStorage
+    private let authAPIClient: AuthAPIClientProtocol
+    private let secureStorage: SecureStorageProtocol
     
     private var state: String?
     
-    init(authAPIClient: AuthAPIClient, secureStorage: SecureStorage) {
+    init(authAPIClient: AuthAPIClientProtocol, secureStorage: SecureStorageProtocol) {
         self.authAPIClient = authAPIClient
         self.secureStorage = secureStorage
     }
@@ -53,8 +53,8 @@ final class SignInViewModel: ObservableObject {
                 }
                 
                 do {
-                    let token = try await authAPIClient.fetchAccessToken(code)
-                    try secureStorage.saveToken(token)
+                    let token = try await authAPIClient.fetchAccessToken(code: code)
+                    try secureStorage.saveToken(token: token)
                     await events.send(.completeSignIn)
                 } catch {
                     switch error {

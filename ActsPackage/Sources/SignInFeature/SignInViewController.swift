@@ -1,6 +1,7 @@
 import UIKit
 import AuthenticationServices
 import Core
+import AuthAPI
 
 public final class SignInViewController: UIViewController {
     private let viewModel: SignInViewModel
@@ -8,7 +9,7 @@ public final class SignInViewController: UIViewController {
     
     @MainActor
     public init() {
-        viewModel = .init(authAPIClient: .live, secureStorage: .live)
+        viewModel = .init(authAPIClient: AuthAPIClient.shared, secureStorage: SecureStorage.shared)
         
         super.init(nibName: nil, bundle: nil)
     }

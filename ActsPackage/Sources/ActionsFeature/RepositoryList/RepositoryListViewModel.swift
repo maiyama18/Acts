@@ -14,9 +14,9 @@ final class RepositoryListViewModel: ObservableObject {
     
     let events: AsyncChannel<Event> = .init()
     
-    private let secureStorage: SecureStorage
+    private let secureStorage: SecureStorageProtocol
     
-    init(secureStorage: SecureStorage) {
+    init(secureStorage: SecureStorageProtocol) {
         self.secureStorage = secureStorage
     }
     
