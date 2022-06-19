@@ -29,11 +29,18 @@ let package = Package(
         .target(
             name: "ActionsFeature",
             dependencies: [
+                "GitHubAPI",
                 "Core",
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
             ]
         ),
         .target(name: "AuthAPI"),
+        .target(
+            name: "GitHubAPI",
+            dependencies: [
+                "Core",
+            ]
+        ),
         .target(
             name: "Core",
             dependencies: [

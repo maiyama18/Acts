@@ -4,10 +4,18 @@ struct RepositoryListScreen: View {
     @ObservedObject var viewModel: RepositoryListViewModel
     
     var body: some View {
-        Button(action: {
-            viewModel.execute(.signOutButtonTapped)
-        }) {
-            Text("Sign Out from GitHub")
+        VStack {
+            Button(action: {
+                viewModel.execute(.signOutButtonTapped)
+            }) {
+                Text("Sign Out from GitHub")
+            }
+            
+            List {
+                ForEach(viewModel.repositories) { repository in
+                    Text(repository.name)
+                }
+            }
         }
     }
 }

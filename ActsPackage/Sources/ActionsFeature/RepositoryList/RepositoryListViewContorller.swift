@@ -1,5 +1,6 @@
 import UIKit
 import Core
+import GitHubAPI
 
 public final class RepositoryListViewController: UIViewController {
     private let viewModel: RepositoryListViewModel
@@ -7,7 +8,7 @@ public final class RepositoryListViewController: UIViewController {
     
     @MainActor
     public init() {
-        viewModel = .init(secureStorage: SecureStorage.shared)
+        viewModel = .init(gitHubAPIClient: GitHubAPIClient.shared, secureStorage: SecureStorage.shared)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -25,6 +26,8 @@ public final class RepositoryListViewController: UIViewController {
         
         subscribe()
         hostSwiftUIView(RepositoryListScreen(viewModel: viewModel))
+        
+        viewModel.execute(.viewLoaded)
     }
     
     private func subscribe() {
@@ -33,6 +36,8 @@ public final class RepositoryListViewController: UIViewController {
             for await event in self.viewModel.events {
                 switch event {
                 case .completeSignOut:
+                    NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
+                case .unauthorized:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case .showError(let message):
                     Dialogs.showSimpleError(from: self, message: message)
