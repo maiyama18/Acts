@@ -6,11 +6,13 @@
 //
 
 import UIKit
+import PKHUD
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        true
+        setupHUD()
+        return true
     }
 
     // MARK: UISceneSession Lifecycle
@@ -20,4 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_: UIApplication, didDiscardSceneSessions _: Set<UISceneSession>) {}
+    
+    private func setupHUD() {
+        PKHUD.sharedHUD.gracePeriod = 0.3
+    }
 }

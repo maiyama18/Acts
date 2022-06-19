@@ -12,6 +12,8 @@ final class SignInViewModel: ObservableObject {
         case showError(message: String)
     }
     
+    @Published private(set) var showingHUD: Bool = false
+    
     let events: AsyncChannel<Event> = .init()
     
     private let authAPIClient: AuthAPIClientProtocol
@@ -46,6 +48,10 @@ final class SignInViewModel: ObservableObject {
             return
         }
         
+        showingHUD = true
+        defer {
+            showingHUD = false
+        }
         do {
             let token = try await authAPIClient.fetchAccessToken(code: code)
             try secureStorage.saveToken(token: token)

@@ -12,6 +12,7 @@ final class RepositoryListViewModel: ObservableObject {
     }
     
     @Published private(set) var repositories: [GitHubRepository] = []
+    @Published private(set) var showingHUD: Bool = false
     
     let events: AsyncChannel<Event> = .init()
     
@@ -24,6 +25,10 @@ final class RepositoryListViewModel: ObservableObject {
     }
     
     func onViewLoaded() async {
+        showingHUD = true
+        defer {
+            showingHUD = false
+        }
         do {
             repositories = try await gitHubAPIClient.getRepositories()
         } catch {

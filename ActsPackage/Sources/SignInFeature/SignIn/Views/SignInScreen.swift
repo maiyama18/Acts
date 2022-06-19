@@ -1,4 +1,5 @@
 import SwiftUI
+import PKHUD
 
 struct SignInScreen: View {
     @ObservedObject var viewModel: SignInViewModel
@@ -13,5 +14,6 @@ struct SignInScreen: View {
                 Text("Sign In with GitHub")
             }
         }
+        .progressHUD(showing: viewModel.showingHUD)
     }
 }

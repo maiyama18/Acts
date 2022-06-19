@@ -15,6 +15,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-async-algorithms", branch: "swift-5.6"),
         .package(url: "https://github.com/kishikawakatsumi/KeychainAccess", exact: "4.2.2"),
+        .package(url: "https://github.com/pkluz/PKHUD", exact: "5.4.0"),
     ],
     targets: [
         .target(name: "App", dependencies: ["SignInFeature", "ActionsFeature"]),
@@ -45,6 +46,7 @@ let package = Package(
             name: "Core",
             dependencies: [
                 .product(name: "KeychainAccess", package: "KeychainAccess"),
+                .product(name: "PKHUD", package: "PKHUD"),
             ]
         )
     ]

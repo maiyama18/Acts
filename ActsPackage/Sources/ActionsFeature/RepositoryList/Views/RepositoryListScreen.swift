@@ -1,4 +1,5 @@
 import SwiftUI
+import PKHUD
 
 struct RepositoryListScreen: View {
     @ObservedObject var viewModel: RepositoryListViewModel
@@ -19,5 +20,6 @@ struct RepositoryListScreen: View {
                 }
             }
         }
+        .progressHUD(showing: viewModel.showingHUD)
     }
 }
