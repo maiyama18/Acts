@@ -6,11 +6,6 @@ import Core
 
 @MainActor
 final class SignInViewModel: ObservableObject {
-    enum Action {
-        case signInButtonTapped
-        case callBackReceived(url: URL)
-    }
-    
     enum Event {
         case startAuth(url: URL)
         case completeSignIn
@@ -29,45 +24,42 @@ final class SignInViewModel: ObservableObject {
         self.secureStorage = secureStorage
     }
     
-    func execute(_ action: Action) {
-        Task {
-            switch action {
-            case .signInButtonTapped:
-                let state = UUID().uuidString
-                self.state = state
-                guard let url = makeOAuthURL(state: state) else {
-                    await events.send(.showError(message: "Unexpected error occurred"))
-                    return
-                }
-                await events.send(.startAuth(url: url))
-            case .callBackReceived(let url):
-                guard let state = extractQueryValue(from: url, name: "state"), state == self.state else {
-                    await events.send(.showError(message: "Unexpected error occurred"))
-                    return
-                }
-                self.state = nil
-                
-                guard let code = extractQueryValue(from: url, name: "code") else {
-                    await events.send(.showError(message: "Unexpected error occurred"))
-                    return
-                }
-                
-                do {
-                    let token = try await authAPIClient.fetchAccessToken(code: code)
-                    try secureStorage.saveToken(token: token)
-                    await events.send(.completeSignIn)
-                } catch {
-                    switch error {
-                    case AuthAPIError.authFailed(let message):
-                        await events.send(.showError(message: message))
-                    case AuthAPIError.disconnected:
-                        await events.send(.showError(message: "Network disconnected"))
-                    default:
-                        await events.send(.showError(message: "Unexpected error occurred"))
-                    }
-                    return
-                }
+    func onSignInButtonTapped() async {
+        let state = UUID().uuidString
+        self.state = state
+        guard let url = makeOAuthURL(state: state) else {
+            await events.send(.showError(message: "Unexpected error occurred"))
+            return
+        }
+        await events.send(.startAuth(url: url))
+    }
+    
+    func onCallBackReceived(url: URL) async {
+        guard let state = extractQueryValue(from: url, name: "state"), state == self.state else {
+            await events.send(.showError(message: "Unexpected error occurred"))
+            return
+        }
+        self.state = nil
+        
+        guard let code = extractQueryValue(from: url, name: "code") else {
+            await events.send(.showError(message: "Unexpected error occurred"))
+            return
+        }
+        
+        do {
+            let token = try await authAPIClient.fetchAccessToken(code: code)
+            try secureStorage.saveToken(token: token)
+            await events.send(.completeSignIn)
+        } catch {
+            switch error {
+            case AuthAPIError.authFailed(let message):
+                await events.send(.showError(message: message))
+            case AuthAPIError.disconnected:
+                await events.send(.showError(message: "Network disconnected"))
+            default:
+                await events.send(.showError(message: "Unexpected error occurred"))
             }
+            return
         }
     }
     

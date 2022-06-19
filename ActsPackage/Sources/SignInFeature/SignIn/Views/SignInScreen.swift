@@ -6,7 +6,9 @@ struct SignInScreen: View {
     var body: some View {
         VStack {
             Button(action: {
-                viewModel.execute(.signInButtonTapped)
+                Task {
+                    await viewModel.onSignInButtonTapped()
+                }
             }) {
                 Text("Sign In with GitHub")
             }

@@ -27,7 +27,9 @@ public final class RepositoryListViewController: UIViewController {
         subscribe()
         hostSwiftUIView(RepositoryListScreen(viewModel: viewModel))
         
-        viewModel.execute(.viewLoaded)
+        Task {
+            await viewModel.onViewLoaded()
+        }
     }
     
     private func subscribe() {

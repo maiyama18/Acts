@@ -44,7 +44,9 @@ public final class SignInViewController: UIViewController {
                             print("Failed to authenticate: callbackURL is nil")
                             return
                         }
-                        self.viewModel.execute(.callBackReceived(url: callbackURL))
+                        Task {
+                            await self.viewModel.onCallBackReceived(url: callbackURL)
+                        }
                     }
                     session.presentationContextProvider = self
                     session.start()

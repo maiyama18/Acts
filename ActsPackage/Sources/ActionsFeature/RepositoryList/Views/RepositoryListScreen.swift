@@ -6,7 +6,9 @@ struct RepositoryListScreen: View {
     var body: some View {
         VStack {
             Button(action: {
-                viewModel.execute(.signOutButtonTapped)
+                Task {
+                    await viewModel.onSignOutButtonTapped()
+                }
             }) {
                 Text("Sign Out from GitHub")
             }
