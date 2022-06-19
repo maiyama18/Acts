@@ -8,7 +8,7 @@ public final class SignInViewController: UIViewController {
     
     @MainActor
     public init() {
-        viewModel = .init()
+        viewModel = .init(authAPIClient: .live)
         
         super.init(nibName: nil, bundle: nil)
     }

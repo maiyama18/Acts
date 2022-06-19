@@ -20,10 +20,12 @@ let package = Package(
         .target(
             name: "SignInFeature",
             dependencies: [
+                "AuthAPI",
                 "Core",
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
             ]
         ),
+        .target(name: "AuthAPI"),
         .target(name: "Core")
     ]
 )

@@ -1,6 +1,7 @@
 import Combine
 import AsyncAlgorithms
 import Foundation
+import AuthAPI
 
 @MainActor
 final class SignInViewModel: ObservableObject {
@@ -14,11 +15,16 @@ final class SignInViewModel: ObservableObject {
         case showError(message: String)
     }
     
-    @Published var code: String?
+    @Published var token: String?
     
     let events: AsyncChannel<Event> = .init()
     
+    private let authAPIClient: AuthAPIClient
     private var state: String?
+    
+    init(authAPIClient: AuthAPIClient) {
+        self.authAPIClient = authAPIClient
+    }
     
     func execute(_ action: Action) {
         Task {
@@ -32,7 +38,6 @@ final class SignInViewModel: ObservableObject {
                 }
                 await events.send(.startAuth(url: url))
             case .callBackReceived(let url):
-                print("url \(url)")
                 guard let state = extractQueryValue(from: url, name: "state"), state == self.state else {
                     await events.send(.showError(message: "Unexpected error occurred"))
                     return
@@ -43,7 +48,20 @@ final class SignInViewModel: ObservableObject {
                     await events.send(.showError(message: "Unexpected error occurred"))
                     return
                 }
-                self.code = code
+                
+                do {
+                    token = try await authAPIClient.fetchAccessToken(code)
+                } catch {
+                    switch error {
+                    case AuthAPIError.authFailed(let message):
+                        await events.send(.showError(message: message))
+                    case AuthAPIError.disconnected:
+                        await events.send(.showError(message: "Network disconnected"))
+                    default:
+                        await events.send(.showError(message: "Unexpected error occurred"))
+                    }
+                    return
+                }
             }
         }
     }
