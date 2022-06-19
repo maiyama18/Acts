@@ -8,7 +8,7 @@ public final class SignInViewController: UIViewController {
     
     @MainActor
     public init() {
-        viewModel = .init(authAPIClient: .live)
+        viewModel = .init(authAPIClient: .live, secureStorage: .live)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -47,6 +47,8 @@ public final class SignInViewController: UIViewController {
                     }
                     session.presentationContextProvider = self
                     session.start()
+                case .completeSignIn:
+                    NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case .showError(let message):
                     Dialogs.showSimpleError(from: self, message: message)
                 }

@@ -13,10 +13,11 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-async-algorithms", branch: "swift-5.6")
+        .package(url: "https://github.com/apple/swift-async-algorithms", branch: "swift-5.6"),
+        .package(url: "https://github.com/kishikawakatsumi/KeychainAccess", exact: "4.2.2"),
     ],
     targets: [
-        .target(name: "App", dependencies: ["SignInFeature"]),
+        .target(name: "App", dependencies: ["SignInFeature", "ActionsFeature"]),
         .target(
             name: "SignInFeature",
             dependencies: [
@@ -25,7 +26,19 @@ let package = Package(
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
             ]
         ),
+        .target(
+            name: "ActionsFeature",
+            dependencies: [
+                "Core",
+                .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
+            ]
+        ),
         .target(name: "AuthAPI"),
-        .target(name: "Core")
+        .target(
+            name: "Core",
+            dependencies: [
+                .product(name: "KeychainAccess", package: "KeychainAccess"),
+            ]
+        )
     ]
 )

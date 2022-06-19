@@ -2,6 +2,7 @@ import Combine
 import AsyncAlgorithms
 import Foundation
 import AuthAPI
+import Core
 
 @MainActor
 final class SignInViewModel: ObservableObject {
@@ -12,18 +13,20 @@ final class SignInViewModel: ObservableObject {
     
     enum Event {
         case startAuth(url: URL)
+        case completeSignIn
         case showError(message: String)
     }
-    
-    @Published var token: String?
     
     let events: AsyncChannel<Event> = .init()
     
     private let authAPIClient: AuthAPIClient
+    private let secureStorage: SecureStorage
+    
     private var state: String?
     
-    init(authAPIClient: AuthAPIClient) {
+    init(authAPIClient: AuthAPIClient, secureStorage: SecureStorage) {
         self.authAPIClient = authAPIClient
+        self.secureStorage = secureStorage
     }
     
     func execute(_ action: Action) {
@@ -50,7 +53,9 @@ final class SignInViewModel: ObservableObject {
                 }
                 
                 do {
-                    token = try await authAPIClient.fetchAccessToken(code)
+                    let token = try await authAPIClient.fetchAccessToken(code)
+                    try secureStorage.saveToken(token)
+                    await events.send(.completeSignIn)
                 } catch {
                     switch error {
                     case AuthAPIError.authFailed(let message):

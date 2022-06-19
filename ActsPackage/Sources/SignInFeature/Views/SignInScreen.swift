@@ -10,8 +10,6 @@ struct SignInScreen: View {
             }) {
                 Text("Sign In with GitHub")
             }
-            
-            Text("token: \(viewModel.token ?? "nil")")
         }
     }
 }
