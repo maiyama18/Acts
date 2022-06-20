@@ -52,5 +52,9 @@ let package = Package(
                 .process("Resources/Localizable.strings"),
             ]
         ),
+        .testTarget(
+            name: "ActsPackageTests",
+            dependencies: ["SignInFeature"]
+        ),
     ]
 )
