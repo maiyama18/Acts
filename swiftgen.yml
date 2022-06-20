@@ -1,0 +1,8 @@
+strings:
+  inputs:
+    - ActsPackage/Sources/Core/Resources/Localizable.strings
+  outputs:
+    - templateName: structured-swift5
+      params:
+        publicAccess: true
+      output: ActsPackage/Sources/Core/Resources/Generated/Strings+Generated.swift

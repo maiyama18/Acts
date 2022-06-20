@@ -47,6 +47,9 @@ let package = Package(
             dependencies: [
                 .product(name: "KeychainAccess", package: "KeychainAccess"),
                 .product(name: "PKHUD", package: "PKHUD"),
+            ],
+            resources: [
+                .process("Resources/Localizable.strings"),
             ]
         ),
     ]

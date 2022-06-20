@@ -1,3 +1,4 @@
+import Core
 import PKHUD
 import SwiftUI
 
@@ -11,7 +12,7 @@ struct SignInScreen: View {
                     await viewModel.onSignInButtonTapped()
                 }
             }) {
-                Text("Sign In with GitHub")
+                Text(L10n.SignInFeature.signInWithGithub)
             }
         }
         .progressHUD(showing: viewModel.showingHUD)

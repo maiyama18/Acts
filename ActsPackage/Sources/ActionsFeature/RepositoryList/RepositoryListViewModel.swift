@@ -36,9 +36,9 @@ final class RepositoryListViewModel: ObservableObject {
             case GitHubAPIError.unauthorized:
                 await events.send(.unauthorized)
             case GitHubAPIError.disconnected:
-                await events.send(.showError(message: "Network disconnected"))
+                await events.send(.showError(message: L10n.ErrorMessage.disconnected))
             default:
-                await events.send(.showError(message: "Unexpected error occurred"))
+                await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             }
         }
     }
@@ -48,7 +48,7 @@ final class RepositoryListViewModel: ObservableObject {
             try secureStorage.removeToken()
             await events.send(.completeSignOut)
         } catch {
-            await events.send(.showError(message: "Unexpected error occurred"))
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
         }
     }
 }

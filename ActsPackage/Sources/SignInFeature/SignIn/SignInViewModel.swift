@@ -38,13 +38,13 @@ final class SignInViewModel: ObservableObject {
 
     func onCallBackReceived(url: URL) async {
         guard let state = extractQueryValue(from: url, name: "state"), state == self.state else {
-            await events.send(.showError(message: "Unexpected error occurred"))
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             return
         }
         self.state = nil
 
         guard let code = extractQueryValue(from: url, name: "code") else {
-            await events.send(.showError(message: "Unexpected error occurred"))
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             return
         }
 
@@ -61,9 +61,9 @@ final class SignInViewModel: ObservableObject {
             case let AuthAPIError.authFailed(message):
                 await events.send(.showError(message: message))
             case AuthAPIError.disconnected:
-                await events.send(.showError(message: "Network disconnected"))
+                await events.send(.showError(message: L10n.ErrorMessage.disconnected))
             default:
-                await events.send(.showError(message: "Unexpected error occurred"))
+                await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             }
             return
         }

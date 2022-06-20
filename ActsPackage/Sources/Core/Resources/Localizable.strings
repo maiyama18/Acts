@@ -1,0 +1,9 @@
+"common.error" = "Error";
+"common.ok" = "OK";
+"common.delete" = "Delete";
+"common.cancel" = "Cancel";
+
+"error_message.unexpected_error" = "Unexpected error occurred";
+"error_message.disconnected" = "Network disconnected";
+
+"sign_in_feature.sign_in_with_github" = "Sign In with GitHub";
