@@ -78,6 +78,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3878435F285DB81700B046AD /* Build configuration list for PBXNativeTarget "Acts" */;
 			buildPhases = (
+				38784367285FFA8A00B046AD /* Generate Resources Accessor */,
 				38784365285FEEE700B046AD /* Apply Format */,
 				38784347285DB81600B046AD /* Sources */,
 				38784348285DB81600B046AD /* Frameworks */,
@@ -158,6 +159,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "make format\n";
+		};
+		38784367285FFA8A00B046AD /* Generate Resources Accessor */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Generate Resources Accessor";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make gen\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
