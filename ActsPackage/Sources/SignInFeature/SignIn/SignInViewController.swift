@@ -38,11 +38,11 @@ public final class SignInViewController: UIViewController {
                 case let .startAuth(url):
                     let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "acts") { callbackURL, error in
                         if let error = error {
-                            print("Failed to authenticate: \(error)")
+                            logger.notice("Failed to authenticate: \(error.localizedDescription, privacy: .public)")
                             return
                         }
                         guard let callbackURL = callbackURL else {
-                            print("Failed to authenticate: callbackURL is nil")
+                            logger.notice("Failed to authenticate: callbackURL is nil")
                             return
                         }
                         Task {
