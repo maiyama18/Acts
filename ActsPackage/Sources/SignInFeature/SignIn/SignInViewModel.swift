@@ -36,7 +36,12 @@ final class SignInViewModel: ObservableObject {
         await events.send(.startAuth(url: url))
     }
 
-    func onCallBackReceived(url: URL) async {
+    func onCallBackReceived(url: URL?) async {
+        guard let url = url else {
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+            return
+        }
+
         guard let state = extractQueryValue(from: url, name: "state"), state == self.state else {
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             return

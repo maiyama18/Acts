@@ -36,21 +36,14 @@ public final class SignInViewController: UIViewController {
             for await event in self.viewModel.events {
                 switch event {
                 case let .startAuth(url):
-                    let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "acts") { callbackURL, error in
-                        if let error = error {
-                            logger.notice("Failed to authenticate: \(error.localizedDescription, privacy: .public)")
-                            return
-                        }
-                        guard let callbackURL = callbackURL else {
-                            logger.notice("Failed to authenticate: callbackURL is nil")
-                            return
-                        }
-                        Task {
+                    Task {
+                        do {
+                            let callbackURL = try await ASWebAuthenticationSession.start(url: url, callbackURLScheme: "acts", presentationContextProvider: self)
                             await self.viewModel.onCallBackReceived(url: callbackURL)
+                        } catch {
+                            logger.notice("Failed to authenticate: \(error.localizedDescription, privacy: .public)")
                         }
                     }
-                    session.presentationContextProvider = self
-                    session.start()
                 case .completeSignIn:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case let .showError(message):
