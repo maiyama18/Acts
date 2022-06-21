@@ -20,12 +20,6 @@ jobs:
           cache-prefix: "mint"
           bootstrap: false
 
-      - name: show PATH
-        run: |
-          echo $PATH
-          echo $(brew --prefix)
-          echo $(which mint)
-
       - name: create mocks
         run: make mock
 
