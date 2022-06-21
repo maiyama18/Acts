@@ -158,7 +158,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "make format\n";
+			shellScript = "if [ -f \"$SRCROOT/.envrc\" ]; then\n  source \"$SRCROOT/.envrc\"\nfi\n\nmake format\n";
 		};
 		38784367285FFA8A00B046AD /* Generate Resources Accessor */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -176,7 +176,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "make gen\n";
+			shellScript = "if [ -f \"$SRCROOT/.envrc\" ]; then\n  source \"$SRCROOT/.envrc\"\nfi\n\nmake gen\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
