@@ -12,4 +12,4 @@ mock:
 
 .PHONY: test
 test:
-	xcodebuild -workspace Acts.xcworkspace -scheme ActsPackageTests -sdk iphonesimulator -destination platform='iOS Simulator,name=iPhone 13,OS=15.2' test
+	xcodebuild -workspace Acts.xcworkspace -scheme ActsPackageTests -sdk iphonesimulator -destination platform='iOS Simulator,name=iPhone 13' test
