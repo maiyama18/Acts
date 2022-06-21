@@ -6,7 +6,7 @@ import Foundation
 
 @MainActor
 final class SignInViewModel: ObservableObject {
-    enum Event {
+    enum Event: Equatable {
         case startAuth(url: URL)
         case completeSignIn
         case showError(message: String)
@@ -18,16 +18,22 @@ final class SignInViewModel: ObservableObject {
 
     private let authAPIClient: AuthAPIClientProtocol
     private let secureStorage: SecureStorageProtocol
+    private let stateGenerator: StateGeneratorProtocol
 
     private var state: String?
 
-    init(authAPIClient: AuthAPIClientProtocol, secureStorage: SecureStorageProtocol) {
+    init(
+        authAPIClient: AuthAPIClientProtocol,
+        secureStorage: SecureStorageProtocol,
+        stateGenerator: StateGeneratorProtocol
+    ) {
         self.authAPIClient = authAPIClient
         self.secureStorage = secureStorage
+        self.stateGenerator = stateGenerator
     }
 
     func onSignInButtonTapped() async {
-        let state = UUID().uuidString
+        let state = stateGenerator.generate()
         self.state = state
         guard let url = makeOAuthURL(state: state) else {
             await events.send(.showError(message: "Unexpected error occurred"))

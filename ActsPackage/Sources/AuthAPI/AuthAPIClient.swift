@@ -2,6 +2,7 @@ import Foundation
 
 let authAPIURL = URL(string: "https://acts-api.herokuapp.com/code")!
 
+/// @mockable
 public protocol AuthAPIClientProtocol {
     func fetchAccessToken(code: String) async throws -> String
 }

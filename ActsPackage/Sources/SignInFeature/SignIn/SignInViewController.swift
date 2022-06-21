@@ -9,7 +9,11 @@ public final class SignInViewController: UIViewController {
 
     @MainActor
     public init() {
-        viewModel = .init(authAPIClient: AuthAPIClient.shared, secureStorage: SecureStorage.shared)
+        viewModel = .init(
+            authAPIClient: AuthAPIClient.shared,
+            secureStorage: SecureStorage.shared,
+            stateGenerator: StateGenerator.shared
+        )
 
         super.init(nibName: nil, bundle: nil)
     }
