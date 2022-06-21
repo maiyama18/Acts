@@ -30,7 +30,16 @@ let package = Package(
         .target(
             name: "ActionsFeature",
             dependencies: [
+                "SettingsFeature",
                 "GitHubAPI",
+                "Core",
+                .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
+            ]
+        ),
+        .target(
+            name: "SettingsFeature",
+            dependencies: [
+                "AuthAPI",
                 "Core",
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
             ]
@@ -54,7 +63,10 @@ let package = Package(
         ),
         .testTarget(
             name: "ActsPackageTests",
-            dependencies: ["SignInFeature"]
+            dependencies: [
+                "SignInFeature",
+                "SettingsFeature",
+            ]
         ),
     ]
 )
