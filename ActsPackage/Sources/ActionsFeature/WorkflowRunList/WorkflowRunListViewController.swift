@@ -45,7 +45,7 @@ public final class WorkflowRunListViewController: UIViewController {
             for await event in self.viewModel.events {
                 switch event {
                 case let .showWorkflowRun(workflowRun):
-                    print(workflowRun)
+                    pushWorkflowRunDetail(from: self, workflowRun: workflowRun)
                 case .unauthorized:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case let .showError(message):
@@ -55,3 +55,6 @@ public final class WorkflowRunListViewController: UIViewController {
         }
     }
 }
+
+extension WorkflowRunListViewController:
+    WorkflowRunDetailRouting {}
