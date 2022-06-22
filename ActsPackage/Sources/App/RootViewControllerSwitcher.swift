@@ -20,7 +20,7 @@ public final class RootViewControllerSwitcher {
     @objc
     private func switchRootViewController() {
         if secureStorage.getToken() != nil {
-            window.rootViewController = RepositoryListViewController()
+            window.rootViewController = UINavigationController(rootViewController: RepositoryListViewController())
         } else {
             window.rootViewController = SignInViewController()
         }

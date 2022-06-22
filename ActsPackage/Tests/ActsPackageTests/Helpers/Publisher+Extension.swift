@@ -8,7 +8,7 @@ extension Publisher where Failure == Never {
         let channel: AsyncChannel<Output> = .init()
 
         dropFirst().sink { value in
-            let _ = Task {
+            Task {
                 await channel.send(value)
             }
         }

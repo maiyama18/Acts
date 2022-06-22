@@ -6,7 +6,7 @@ import GitHubAPI
 @MainActor
 final class RepositoryListViewModel: ObservableObject {
     enum Event {
-        case completeSignOut
+        case showSettings
         case unauthorized
         case showError(message: String)
     }
@@ -43,12 +43,7 @@ final class RepositoryListViewModel: ObservableObject {
         }
     }
 
-    func onSignOutButtonTapped() async {
-        do {
-            try secureStorage.removeToken()
-            await events.send(.completeSignOut)
-        } catch {
-            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
-        }
+    func onSettingsButtonTapped() async {
+        await events.send(.showSettings)
     }
 }
