@@ -5,7 +5,7 @@ import Core
 import Foundation
 
 @MainActor
-final class SignInViewModel: ObservableObject {
+public final class SignInViewModel: ObservableObject {
     enum Event: Equatable {
         case startAuth(url: URL)
         case completeSignIn
@@ -22,7 +22,7 @@ final class SignInViewModel: ObservableObject {
 
     private var state: String?
 
-    init(
+    public init(
         authAPIClient: AuthAPIClientProtocol,
         secureStorage: SecureStorageProtocol,
         stateGenerator: StateGeneratorProtocol

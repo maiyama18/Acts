@@ -9,8 +9,10 @@ public final class RepositoryListViewController: UIViewController {
     private var eventSubscription: Task<Void, Never>?
 
     @MainActor
-    public init() {
-        viewModel = .init(gitHubAPIClient: GitHubAPIClient.shared, secureStorage: SecureStorage.shared)
+    public init(
+        viewModel: RepositoryListViewModel
+    ) {
+        self.viewModel = viewModel
 
         super.init(nibName: nil, bundle: nil)
     }

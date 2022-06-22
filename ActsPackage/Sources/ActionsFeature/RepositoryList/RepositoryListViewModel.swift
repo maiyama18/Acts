@@ -4,7 +4,7 @@ import Core
 import GitHubAPI
 
 @MainActor
-final class RepositoryListViewModel: ObservableObject {
+public final class RepositoryListViewModel: ObservableObject {
     enum Event {
         case showSettings
         case showRepository(repository: GitHubRepository)
@@ -20,7 +20,7 @@ final class RepositoryListViewModel: ObservableObject {
     private let gitHubAPIClient: GitHubAPIClientProtocol
     private let secureStorage: SecureStorageProtocol
 
-    init(gitHubAPIClient: GitHubAPIClientProtocol, secureStorage: SecureStorageProtocol) {
+    public init(gitHubAPIClient: GitHubAPIClientProtocol, secureStorage: SecureStorageProtocol) {
         self.gitHubAPIClient = gitHubAPIClient
         self.secureStorage = secureStorage
     }

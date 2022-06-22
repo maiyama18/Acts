@@ -8,12 +8,8 @@ public final class SignInViewController: UIViewController {
     private var eventSubscription: Task<Void, Never>?
 
     @MainActor
-    public init() {
-        viewModel = .init(
-            authAPIClient: AuthAPIClient.shared,
-            secureStorage: SecureStorage.shared,
-            stateGenerator: StateGenerator.shared
-        )
+    public init(viewModel: SignInViewModel) {
+        self.viewModel = viewModel
 
         super.init(nibName: nil, bundle: nil)
     }
