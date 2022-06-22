@@ -1,10 +1,16 @@
 import AsyncAlgorithms
 import Combine
+import Core
 import GitHubAPI
 
 @MainActor
 public final class WorkflowRunDetailViewModel: ObservableObject {
-    enum Event {}
+    enum Event {
+        case unauthorized
+        case showError(message: String)
+    }
+
+    @Published private(set) var workflowJobs: [GitHubWorkflowJob] = []
 
     let events: AsyncChannel<Event> = .init()
 
@@ -23,5 +29,19 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
         self.gitHubAPIClient = gitHubAPIClient
     }
 
-    func onViewLoaded() async {}
+    func onViewLoaded() async {
+        do {
+            let response = try await gitHubAPIClient.getWorkflowJobs(workflowRun: workflowRun)
+            workflowJobs = response.jobs
+        } catch {
+            switch error {
+            case GitHubAPIError.unauthorized:
+                await events.send(.unauthorized)
+            case GitHubAPIError.disconnected:
+                await events.send(.showError(message: L10n.ErrorMessage.disconnected))
+            default:
+                await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+            }
+        }
+    }
 }

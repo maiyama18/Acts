@@ -4,6 +4,7 @@ import Foundation
 public protocol GitHubAPIClientProtocol {
     func getRepositories() async throws -> [GitHubRepository]
     func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns
+    func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs
 }
 
 public final class GitHubAPIClient: GitHubAPIClientProtocol {
@@ -29,6 +30,10 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         try await request(urlString: "https://api.github.com/repos/\(repository.owner.login)/\(repository.name)/actions/runs", method: "GET")
     }
 
+    public func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs {
+        try await request(urlString: workflowRun.jobsUrl, method: "GET")
+    }
+
     private func request<R: Codable>(urlString: String, method: String) async throws -> R {
         guard let token = secureStorage.getToken() else {
             throw GitHubAPIError.unauthorized
@@ -45,19 +50,28 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         do {
             (data, response) = try await URLSession.shared.data(for: request)
         } catch {
+            logger.notice("URLSession.data failed: \(error.localizedDescription)")
             throw GitHubAPIError.disconnected
         }
 
         guard let response = response as? HTTPURLResponse else {
+            logger.notice("Response conversion failed")
             throw GitHubAPIError.unexpectedError
         }
         switch response.statusCode {
         case 200 ..< 300:
-            return try jsonDecoder.decode(R.self, from: data)
+            do {
+                return try jsonDecoder.decode(R.self, from: data)
+            } catch {
+                logger.notice("GitHub response parse failed: \(String(describing: error))")
+                throw GitHubAPIError.unexpectedError
+            }
         case 401:
+            logger.notice("GitHub request unauthorized")
             try secureStorage.removeToken()
             throw GitHubAPIError.unauthorized
         default:
+            logger.notice("GitHub request failed: \(response.debugDescription)")
             throw GitHubAPIError.unexpectedError
         }
     }

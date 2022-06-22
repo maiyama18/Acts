@@ -1,3 +1,4 @@
+import Core
 import UIKit
 
 final class WorkflowRunDetailViewController: UIViewController {
@@ -27,6 +28,10 @@ final class WorkflowRunDetailViewController: UIViewController {
         setupNavigation()
         subscribe()
         hostSwiftUIView(WorkflowRunDetailScreen(viewModel: viewModel))
+
+        Task {
+            await viewModel.onViewLoaded()
+        }
     }
 
     private func setupNavigation() {
@@ -37,7 +42,12 @@ final class WorkflowRunDetailViewController: UIViewController {
         eventSubscription = Task { [weak self] in
             guard let self = self else { return }
             for await event in self.viewModel.events {
-                switch event {}
+                switch event {
+                case .unauthorized:
+                    NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
+                case let .showError(message):
+                    Dialogs.showSimpleError(from: self, message: message)
+                }
             }
         }
     }
