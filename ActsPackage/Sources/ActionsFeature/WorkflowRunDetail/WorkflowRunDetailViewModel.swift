@@ -11,6 +11,10 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     private let workflowRun: GitHubWorkflowRun
     private let gitHubAPIClient: GitHubAPIClientProtocol
 
+    var title: String {
+        "\(workflowRun.name) #\(workflowRun.runNumber)"
+    }
+
     public init(
         workflowRun: GitHubWorkflowRun,
         gitHubAPIClient: GitHubAPIClientProtocol

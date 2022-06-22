@@ -18,6 +18,7 @@ public struct GitHubWorkflowRuns: Codable {
 public struct GitHubWorkflowRun: Codable, Identifiable {
     public var id: Int
     public var name: String
+    public var runNumber: Int
     public var status: String
     public var conclusion: String
     public var actor: GitHubUser

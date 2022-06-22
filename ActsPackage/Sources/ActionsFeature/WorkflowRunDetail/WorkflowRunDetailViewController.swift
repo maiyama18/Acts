@@ -30,7 +30,7 @@ final class WorkflowRunDetailViewController: UIViewController {
     }
 
     private func setupNavigation() {
-        navigationItem.title = ""
+        navigationItem.title = viewModel.title
     }
 
     private func subscribe() {
