@@ -3,19 +3,30 @@ import Foundation
 
 public protocol GitHubAPIClientProtocol {
     func getRepositories() async throws -> [GitHubRepository]
+    func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns
 }
 
 public final class GitHubAPIClient: GitHubAPIClientProtocol {
     public static let shared: GitHubAPIClient = .init(secureStorage: SecureStorage.shared)
 
     private let secureStorage: SecureStorageProtocol
+    private let jsonDecoder: JSONDecoder
 
     private init(secureStorage: SecureStorageProtocol) {
         self.secureStorage = secureStorage
+
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        jsonDecoder.dateDecodingStrategy = .iso8601
+        self.jsonDecoder = jsonDecoder
     }
 
     public func getRepositories() async throws -> [GitHubRepository] {
         try await request(urlString: "https://api.github.com/user/repos?sort=updated_at", method: "GET")
+    }
+
+    public func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns {
+        try await request(urlString: "https://api.github.com/repos/\(repository.owner.login)/\(repository.name)/actions/runs", method: "GET")
     }
 
     private func request<R: Codable>(urlString: String, method: String) async throws -> R {
@@ -42,7 +53,7 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         }
         switch response.statusCode {
         case 200 ..< 300:
-            return try JSONDecoder().decode(R.self, from: data)
+            return try jsonDecoder.decode(R.self, from: data)
         case 401:
             try secureStorage.removeToken()
             throw GitHubAPIError.unauthorized

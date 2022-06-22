@@ -1,3 +1,4 @@
+import Core
 import GitHubAPI
 import UIKit
 
@@ -21,14 +22,30 @@ public final class WorkflowRunListViewController: UIViewController {
     override public func viewDidLoad() {
         super.viewDidLoad()
 
+        setupNavigation()
         subscribe()
         hostSwiftUIView(WorkflowRunListView(viewModel: viewModel))
+
+        Task {
+            await viewModel.onViewLoaded()
+        }
+    }
+
+    private func setupNavigation() {
+        navigationItem.title = viewModel.title
     }
 
     private func subscribe() {
         eventSubscription = Task { [weak self] in
             guard let self = self else { return }
-            for await event in self.viewModel.events {}
+            for await event in self.viewModel.events {
+                switch event {
+                case .unauthorized:
+                    NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
+                case let .showError(message):
+                    Dialogs.showSimpleError(from: self, message: message)
+                }
+            }
         }
     }
 }
