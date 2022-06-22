@@ -7,6 +7,8 @@ public protocol GitHubAPIClientProtocol {
     func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns
     func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs
     func getWorkflowJobsLog(workflowRun: GitHubWorkflowRun, jobNames: [String], maxLines: Int) async throws -> [String: GitHubWorkflowJobLog]
+    func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws
+    func cancelWorkflow(workflowRun: GitHubWorkflowRun) async throws
 }
 
 public final class GitHubAPIClient: GitHubAPIClientProtocol {
@@ -102,6 +104,14 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         return jobLogs
     }
 
+    public func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws {
+        try await complete(urlString: workflowRun.rerunUrl, method: "POST")
+    }
+
+    public func cancelWorkflow(workflowRun: GitHubWorkflowRun) async throws {
+        try await complete(urlString: workflowRun.cancelUrl, method: "POST")
+    }
+
     private func request<R: Codable>(urlString: String, method: String) async throws -> R {
         guard let token = secureStorage.getToken() else {
             throw GitHubAPIError.unauthorized
@@ -134,6 +144,42 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
                 logger.notice("GitHub response parse failed: \(String(describing: error))")
                 throw GitHubAPIError.unexpectedError
             }
+        case 401:
+            logger.notice("GitHub request unauthorized")
+            try secureStorage.removeToken()
+            throw GitHubAPIError.unauthorized
+        default:
+            logger.notice("GitHub request failed: \(response.debugDescription)")
+            throw GitHubAPIError.unexpectedError
+        }
+    }
+
+    private func complete(urlString: String, method: String) async throws {
+        guard let token = secureStorage.getToken() else {
+            throw GitHubAPIError.unauthorized
+        }
+
+        var request = URLRequest(url: URL(string: urlString)!)
+        request.httpMethod = method
+
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("token \(token)", forHTTPHeaderField: "Authorization")
+
+        let response: URLResponse
+        do {
+            (_, response) = try await URLSession.shared.data(for: request)
+        } catch {
+            logger.notice("URLSession.data failed: \(error.localizedDescription)")
+            throw GitHubAPIError.disconnected
+        }
+
+        guard let response = response as? HTTPURLResponse else {
+            logger.notice("Response conversion failed")
+            throw GitHubAPIError.unexpectedError
+        }
+        switch response.statusCode {
+        case 200 ..< 300:
+            return
         case 401:
             logger.notice("GitHub request unauthorized")
             try secureStorage.removeToken()

@@ -7,6 +7,7 @@ import SwiftUI
 @MainActor
 public final class WorkflowRunDetailViewModel: ObservableObject {
     enum Event {
+        case requestSent(action: String)
         case unauthorized
         case showError(message: String)
     }
@@ -20,6 +21,15 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
 
     var title: String {
         "\(workflowRun.name) #\(workflowRun.runNumber)"
+    }
+
+    var primaryAction: (label: String, action: @MainActor() async -> Void) {
+        switch workflowRun.runStatus {
+        case .queued, .inProgress:
+            return (label: "Cancel", action: onCancelTapped)
+        default:
+            return (label: "Re-run", action: onRerunTapped)
+        }
     }
 
     public init(
@@ -69,6 +79,24 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
                     workflowJobs[jobIndex].steps[stepIndex].log = stepLog.log
                 }
             }
+        } catch {
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+        }
+    }
+
+    func onRerunTapped() async {
+        do {
+            try await gitHubAPIClient.rerunWorkflow(workflowRun: workflowRun)
+            await events.send(.requestSent(action: "Re-run"))
+        } catch {
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+        }
+    }
+
+    func onCancelTapped() async {
+        do {
+            try await gitHubAPIClient.cancelWorkflow(workflowRun: workflowRun)
+            await events.send(.requestSent(action: "Cancel"))
         } catch {
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
         }
