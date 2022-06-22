@@ -7,6 +7,7 @@ import GitHubAPI
 final class RepositoryListViewModel: ObservableObject {
     enum Event {
         case showSettings
+        case showRepository(repository: GitHubRepository)
         case unauthorized
         case showError(message: String)
     }
@@ -41,6 +42,10 @@ final class RepositoryListViewModel: ObservableObject {
                 await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             }
         }
+    }
+
+    func onRepositoryTapped(repository: GitHubRepository) async {
+        await events.send(.showRepository(repository: repository))
     }
 
     func onSettingsButtonTapped() async {

@@ -59,6 +59,8 @@ public final class RepositoryListViewController: UIViewController {
             guard let self = self else { return }
             for await event in self.viewModel.events {
                 switch event {
+                case let .showRepository(repository):
+                    pushWorkflowRunListView(from: self, repository: repository)
                 case .showSettings:
                     presentSettingsView(from: self)
                 case .unauthorized:
@@ -71,4 +73,6 @@ public final class RepositoryListViewController: UIViewController {
     }
 }
 
-extension RepositoryListViewController: SettingsViewRouting {}
+extension RepositoryListViewController:
+    SettingsViewRouting,
+    WorkflowRunListRouting {}
