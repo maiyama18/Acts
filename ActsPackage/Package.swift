@@ -65,6 +65,7 @@ let package = Package(
             name: "ActsPackageTests",
             dependencies: [
                 "SignInFeature",
+                "ActionsFeature",
                 "SettingsFeature",
             ]
         ),
