@@ -1,5 +1,7 @@
 import ActionsFeature
+import AuthAPI
 import Core
+import GitHubAPI
 import SignInFeature
 import UIKit
 
@@ -20,9 +22,18 @@ public final class RootViewControllerSwitcher {
     @objc
     private func switchRootViewController() {
         if secureStorage.getToken() != nil {
-            window.rootViewController = UINavigationController(rootViewController: RepositoryListViewController())
+            let viewModel = RepositoryListViewModel(
+                gitHubAPIClient: GitHubAPIClient.shared,
+                secureStorage: SecureStorage.shared
+            )
+            window.rootViewController = UINavigationController(rootViewController: RepositoryListViewController(viewModel: viewModel))
         } else {
-            window.rootViewController = SignInViewController()
+            let viewModel = SignInViewModel(
+                authAPIClient: AuthAPIClient.shared,
+                secureStorage: SecureStorage.shared,
+                stateGenerator: StateGenerator.shared
+            )
+            window.rootViewController = SignInViewController(viewModel: viewModel)
         }
     }
 

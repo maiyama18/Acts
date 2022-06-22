@@ -8,7 +8,7 @@ gen:
 
 .PHONY: mock
 mock:
-	mint run mockolo --sourcedirs ActsPackage/Sources --destination ActsPackage/Tests/ActsPackageTests/Generated/Mocks+Generated.swift --enable-args-history --custom-imports AuthAPI
+	mint run mockolo --sourcedirs ActsPackage/Sources --destination ActsPackage/Tests/ActsPackageTests/Generated/Mocks+Generated.swift --enable-args-history --custom-imports AuthAPI --custom-imports GitHubAPI
 
 .PHONY: test
 test:

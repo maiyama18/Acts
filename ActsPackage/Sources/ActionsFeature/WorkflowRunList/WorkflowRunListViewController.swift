@@ -1,17 +1,14 @@
 import Core
 import GitHubAPI
-import SettingsFeature
 import UIKit
 
 @MainActor
-public final class RepositoryListViewController: UIViewController {
-    private let viewModel: RepositoryListViewModel
+public final class WorkflowRunListViewController: UIViewController {
+    private let viewModel: WorkflowRunListViewModel
     private var eventSubscription: Task<Void, Never>?
 
     @MainActor
-    public init(
-        viewModel: RepositoryListViewModel
-    ) {
+    public init(viewModel: WorkflowRunListViewModel) {
         self.viewModel = viewModel
 
         super.init(nibName: nil, bundle: nil)
@@ -30,9 +27,8 @@ public final class RepositoryListViewController: UIViewController {
         super.viewDidLoad()
 
         setupNavigation()
-
         subscribe()
-        hostSwiftUIView(RepositoryListScreen(viewModel: viewModel))
+        hostSwiftUIView(WorkflowRunListView(viewModel: viewModel))
 
         Task {
             await viewModel.onViewLoaded()
@@ -40,20 +36,7 @@ public final class RepositoryListViewController: UIViewController {
     }
 
     private func setupNavigation() {
-        navigationItem.title = L10n.ActionsFeature.Title.repositoryList
-        navigationItem.leftBarButtonItem = .init(
-            image: UIImage(systemName: "gearshape"),
-            style: .plain,
-            target: self,
-            action: #selector(didTapSettingsButton)
-        )
-    }
-
-    @objc
-    private func didTapSettingsButton() {
-        Task {
-            await self.viewModel.onSettingsButtonTapped()
-        }
+        navigationItem.title = viewModel.title
     }
 
     private func subscribe() {
@@ -61,10 +44,8 @@ public final class RepositoryListViewController: UIViewController {
             guard let self = self else { return }
             for await event in self.viewModel.events {
                 switch event {
-                case let .showRepository(repository):
-                    pushWorkflowRunListView(from: self, repository: repository)
-                case .showSettings:
-                    presentSettingsView(from: self)
+                case let .showWorkflowRun(workflowRun):
+                    print(workflowRun)
                 case .unauthorized:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case let .showError(message):
@@ -74,7 +55,3 @@ public final class RepositoryListViewController: UIViewController {
         }
     }
 }
-
-extension RepositoryListViewController:
-    SettingsViewRouting,
-    WorkflowRunListRouting {}

@@ -9,6 +9,13 @@ struct RepositoryListScreen: View {
             List {
                 ForEach(viewModel.repositories) { repository in
                     Text(repository.name)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            Task {
+                                await viewModel.onRepositoryTapped(repository: repository)
+                            }
+                        }
                 }
             }
         }
