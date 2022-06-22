@@ -1,5 +1,63 @@
 import Foundation
 
+public enum Status {
+    case queued
+    case inProgress
+    case succeeded
+    case failed
+    case cancelled
+    case skipped
+    case timedOut
+    case other(raw: String)
+
+    init(rawStatus: String, conclusion: String?) {
+        switch rawStatus {
+        case "queued":
+            self = .queued
+        case "in_progress":
+            self = .inProgress
+        case "completed":
+            switch conclusion {
+            case "cancelled":
+                self = .cancelled
+            case "failure":
+                self = .failed
+            case "success":
+                self = .succeeded
+            case "skipped":
+                self = .skipped
+            case "timed_out":
+                self = .timedOut
+            default:
+                self = .other(raw: conclusion ?? "unknown")
+            }
+        default:
+            self = .other(raw: rawStatus)
+        }
+    }
+
+    public func formatted() -> String {
+        switch self {
+        case .queued:
+            return "Queued"
+        case .inProgress:
+            return "InProgress"
+        case .succeeded:
+            return "Succeeded"
+        case .failed:
+            return "Failed"
+        case .cancelled:
+            return "Cancelled"
+        case .skipped:
+            return "Skipped"
+        case .timedOut:
+            return "TimedOut"
+        case let .other(raw):
+            return raw
+        }
+    }
+}
+
 public struct GitHubRepository: Codable, Identifiable {
     public var id: Int
     public var name: String
@@ -18,13 +76,73 @@ public struct GitHubWorkflowRuns: Codable {
 public struct GitHubWorkflowRun: Codable, Identifiable {
     public var id: Int
     public var name: String
-    public var status: String
-    public var conclusion: String
+    public var runNumber: Int
     public var actor: GitHubUser
     public var createdAt: Date
+    public var jobsUrl: String
+    public var logsUrl: String
+    public var rerunUrl: String
+    public var cancelUrl: String
+
+    private var status: String
+    private var conclusion: String?
+
+    public var runStatus: Status {
+        Status(rawStatus: status, conclusion: conclusion)
+    }
+}
+
+public struct GitHubWorkflowJobs: Codable {
+    public var totalCount: Int
+    public var jobs: [GitHubWorkflowJob]
+}
+
+public struct GitHubWorkflowJob: Codable, Identifiable {
+    public var id: Int
+    public var name: String
+    public var steps: [GitHubWorkflowStep]
+
+    private var status: String
+    private var conclusion: String?
+
+    public var jobStatus: Status {
+        Status(rawStatus: status, conclusion: conclusion)
+    }
+}
+
+public struct GitHubWorkflowStep: Codable, Identifiable {
+    public var number: Int
+    public var name: String
+    // filled when needed
+    public var log: String? = nil
+
+    private var status: String
+    private var conclusion: String?
+
+    public var id: Int {
+        number
+    }
+
+    public var hasLog: Bool {
+        log != nil
+    }
+
+    public var stepStatus: Status {
+        Status(rawStatus: status, conclusion: conclusion)
+    }
 }
 
 public struct GitHubUser: Codable {
     public var login: String
     public var avatarUrl: String
+}
+
+public struct GitHubWorkflowJobLog {
+    public var stepLogs: [GitHubWorkflowStepLog]
+}
+
+public struct GitHubWorkflowStepLog {
+    public var stepNumber: Int
+    public var log: String
+    public var abbreviated: Bool
 }

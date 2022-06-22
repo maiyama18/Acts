@@ -8,8 +8,7 @@ struct WorkflowRunListView: View {
             ForEach(viewModel.workflowRuns) { workflowRun in
                 VStack(alignment: .leading) {
                     Text(workflowRun.name)
-                    Text(workflowRun.status)
-                    Text(workflowRun.conclusion)
+                    Text(workflowRun.runStatus.formatted())
                     Text(workflowRun.createdAt.formatted())
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

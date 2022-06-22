@@ -12,6 +12,12 @@ import Foundation
 public enum L10n {
 
   public enum ActionsFeature {
+    public enum Message {
+      /// %@ request successfully sent
+      public static func workflowRequestSent(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "actions_feature.message.workflow_request_sent", String(describing: p1))
+      }
+    }
     public enum Title {
       /// Repositories
       public static let repositoryList = L10n.tr("Localizable", "actions_feature.title.repository_list")

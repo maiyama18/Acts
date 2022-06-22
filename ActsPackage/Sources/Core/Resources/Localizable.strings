@@ -11,4 +11,6 @@
 
 "actions_feature.title.repository_list" = "Repositories";
 
+"actions_feature.message.workflow_request_sent" = "%@ request successfully sent";
+
 "settings_feature.sign_out_from_github" = "Sign Out";

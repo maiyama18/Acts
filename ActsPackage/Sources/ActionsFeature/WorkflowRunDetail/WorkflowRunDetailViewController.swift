@@ -1,16 +1,15 @@
 import Core
-import GitHubAPI
 import UIKit
 
-@MainActor
-public final class WorkflowRunListViewController: UIViewController {
-    private let viewModel: WorkflowRunListViewModel
+final class WorkflowRunDetailViewController: UIViewController {
+    private let viewModel: WorkflowRunDetailViewModel
     private var eventSubscription: Task<Void, Never>?
 
     @MainActor
-    public init(viewModel: WorkflowRunListViewModel) {
+    init(
+        viewModel: WorkflowRunDetailViewModel
+    ) {
         self.viewModel = viewModel
-
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -23,12 +22,12 @@ public final class WorkflowRunListViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         setupNavigation()
         subscribe()
-        hostSwiftUIView(WorkflowRunListView(viewModel: viewModel))
+        hostSwiftUIView(WorkflowRunDetailScreen(viewModel: viewModel))
 
         Task {
             await viewModel.onViewLoaded()
@@ -37,6 +36,12 @@ public final class WorkflowRunListViewController: UIViewController {
 
     private func setupNavigation() {
         navigationItem.title = viewModel.title
+        navigationItem.rightBarButtonItem = .init(
+            title: viewModel.primaryAction.label,
+            style: .plain,
+            target: self,
+            action: #selector(didPrimaryActionButtonTapped)
+        )
     }
 
     private func subscribe() {
@@ -44,8 +49,11 @@ public final class WorkflowRunListViewController: UIViewController {
             guard let self = self else { return }
             for await event in self.viewModel.events {
                 switch event {
-                case let .showWorkflowRun(workflowRun):
-                    pushWorkflowRunDetail(from: self, workflowRun: workflowRun)
+                case let .requestSent(action):
+                    Dialogs.showSimpleMessage(
+                        from: self,
+                        message: L10n.ActionsFeature.Message.workflowRequestSent(action)
+                    )
                 case .unauthorized:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case let .showError(message):
@@ -54,7 +62,11 @@ public final class WorkflowRunListViewController: UIViewController {
             }
         }
     }
-}
 
-extension WorkflowRunListViewController:
-    WorkflowRunDetailRouting {}
+    @objc
+    private func didPrimaryActionButtonTapped() {
+        Task {
+            await viewModel.primaryAction.action()
+        }
+    }
+}
