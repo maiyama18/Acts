@@ -15,7 +15,7 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
     }
 
     public func getRepositories() async throws -> [GitHubRepository] {
-        try await request(urlString: "https://api.github.com/user/repos", method: "GET")
+        try await request(urlString: "https://api.github.com/user/repos?sort=updated_at", method: "GET")
     }
 
     private func request<R: Codable>(urlString: String, method: String) async throws -> R {
