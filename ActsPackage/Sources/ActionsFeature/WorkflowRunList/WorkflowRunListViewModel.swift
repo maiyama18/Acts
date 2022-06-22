@@ -6,6 +6,7 @@ import GitHubAPI
 @MainActor
 public final class WorkflowRunListViewModel: ObservableObject {
     enum Event {
+        case showWorkflowRun(workflowRun: GitHubWorkflowRun)
         case unauthorized
         case showError(message: String)
     }
@@ -46,5 +47,9 @@ public final class WorkflowRunListViewModel: ObservableObject {
                 await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             }
         }
+    }
+
+    func onWorkflowRunTapped(workflowRun: GitHubWorkflowRun) async {
+        await events.send(.showWorkflowRun(workflowRun: workflowRun))
     }
 }

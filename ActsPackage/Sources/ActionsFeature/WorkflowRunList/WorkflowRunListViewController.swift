@@ -40,6 +40,8 @@ public final class WorkflowRunListViewController: UIViewController {
             guard let self = self else { return }
             for await event in self.viewModel.events {
                 switch event {
+                case let .showWorkflowRun(workflowRun):
+                    print(workflowRun)
                 case .unauthorized:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case let .showError(message):

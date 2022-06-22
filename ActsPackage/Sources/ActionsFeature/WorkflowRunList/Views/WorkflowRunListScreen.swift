@@ -12,6 +12,13 @@ struct WorkflowRunListView: View {
                     Text(workflowRun.conclusion)
                     Text(workflowRun.createdAt.formatted())
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    Task {
+                        await viewModel.onWorkflowRunTapped(workflowRun: workflowRun)
+                    }
+                }
             }
         }
         .listStyle(.plain)
