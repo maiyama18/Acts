@@ -2,6 +2,7 @@ import AsyncAlgorithms
 import Combine
 import Core
 import GitHubAPI
+import SwiftUI
 
 @MainActor
 public final class WorkflowRunDetailViewModel: ObservableObject {
@@ -42,6 +43,34 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
             default:
                 await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             }
+        }
+    }
+
+    func onStepTapped(job: GitHubWorkflowJob, step: GitHubWorkflowStep) async {
+        guard !step.hasLog else {
+            for jobIndex in workflowJobs.indices {
+                for stepIndex in workflowJobs[jobIndex].steps.indices {
+                    guard workflowJobs[jobIndex].steps[stepIndex].id == step.id else { continue }
+                    workflowJobs[jobIndex].steps[stepIndex].log = nil
+                }
+            }
+            return
+        }
+
+        do {
+            let response = try await gitHubAPIClient.getWorkflowJobsLog(workflowRun: workflowRun, jobNames: workflowJobs.map(\.name), maxLines: 100)
+            guard let stepLog = response[job.name]?.stepLogs.first(where: { $0.stepNumber == step.number }) else {
+                return
+            }
+            for jobIndex in workflowJobs.indices {
+                guard workflowJobs[jobIndex].id == job.id else { continue }
+                for stepIndex in workflowJobs[jobIndex].steps.indices {
+                    guard workflowJobs[jobIndex].steps[stepIndex].id == step.id else { continue }
+                    workflowJobs[jobIndex].steps[stepIndex].log = stepLog.log
+                }
+            }
+        } catch {
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
         }
     }
 }

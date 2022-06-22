@@ -1,3 +1,4 @@
+import GitHubAPI
 import SwiftUI
 
 struct WorkflowRunDetailScreen: View {
@@ -8,8 +9,14 @@ struct WorkflowRunDetailScreen: View {
             ForEach(viewModel.workflowJobs) { workflowJob in
                 VStack(alignment: .leading) {
                     Text(workflowJob.name)
-                    ForEach(workflowJob.steps) { step in
-                        Text("> " + step.name)
+                        .font(.title2.bold())
+                    ForEach(workflowJob.steps) { workflowStep in
+                        WorkflowStepView(
+                            step: workflowStep,
+                            onTap: {
+                                await viewModel.onStepTapped(job: workflowJob, step: workflowStep)
+                            }
+                        )
                     }
                 }
             }

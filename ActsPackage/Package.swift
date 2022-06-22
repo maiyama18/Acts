@@ -16,6 +16,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-async-algorithms", branch: "swift-5.6"),
         .package(url: "https://github.com/kishikawakatsumi/KeychainAccess", exact: "4.2.2"),
         .package(url: "https://github.com/pkluz/PKHUD", exact: "5.4.0"),
+        .package(url: "https://github.com/weichsel/ZIPFoundation", exact: "0.9.14"),
     ],
     targets: [
         .target(name: "App", dependencies: ["SignInFeature", "ActionsFeature"]),
@@ -49,6 +50,7 @@ let package = Package(
             name: "GitHubAPI",
             dependencies: [
                 "Core",
+                .product(name: "ZIPFoundation", package: "ZIPFoundation"),
             ]
         ),
         .target(
