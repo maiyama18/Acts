@@ -35,6 +35,7 @@ final class WorkflowRunDetailViewController: UIViewController {
     }
 
     private func setupNavigation() {
+        navigationItem.backButtonTitle = ""
         navigationItem.title = viewModel.title
         navigationItem.rightBarButtonItem = .init(
             title: viewModel.primaryAction.label,
