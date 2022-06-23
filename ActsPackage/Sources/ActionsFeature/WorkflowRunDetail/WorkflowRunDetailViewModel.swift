@@ -8,6 +8,7 @@ import SwiftUI
 public final class WorkflowRunDetailViewModel: ObservableObject {
     enum Event {
         case requestSent(action: String)
+        case openOnBrowser(url: URL)
         case unauthorized
         case showError(message: String)
     }
@@ -95,6 +96,11 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
         } catch {
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
         }
+    }
+
+    func onSeeEntireLogTapped(job: GitHubWorkflowJob) async {
+        guard let url = URL(string: job.htmlUrl) else { return }
+        await events.send(.openOnBrowser(url: url))
     }
 
     private func findWorkflowJobsIndices(job: GitHubWorkflowJob, step: GitHubWorkflowStep) -> (jobIndex: Int, stepIndex: Int)? {

@@ -100,6 +100,7 @@ public struct GitHubWorkflowJobs: Codable {
 public struct GitHubWorkflowJob: Codable, Identifiable {
     public var id: Int
     public var name: String
+    public var htmlUrl: String
     public var steps: [GitHubWorkflowStep]
 
     private var status: String

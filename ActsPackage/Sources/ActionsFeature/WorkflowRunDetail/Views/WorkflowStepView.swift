@@ -4,6 +4,7 @@ import SwiftUI
 struct WorkflowStepView: View {
     var step: GitHubWorkflowStep
     var onTap: () async -> Void
+    var onSeeEntireLogTapped: () async -> Void
 
     @State private var logHeight: CGFloat = 300
 
@@ -36,22 +37,44 @@ struct WorkflowStepView: View {
             }
 
             if case let .loaded(log, abbreviated) = step.log {
-                ScrollView {
-                    Text(log)
-                        .font(.caption.monospaced())
-                        .lineSpacing(4)
-                        .padding(8)
-                        .background(
-                            GeometryReader { proxy in
-                                Color.clear
-                                    .onAppear {
-                                        let height = proxy.size.height
-                                        if height < logHeight {
-                                            logHeight = height
-                                        }
+                VStack(spacing: 0) {
+                    if abbreviated {
+                        HStack {
+                            Text("This log is too long.")
+
+                            Text("See entire log on web")
+                                .underline()
+                                .onTapGesture {
+                                    Task {
+                                        await onSeeEntireLogTapped()
                                     }
-                            }
-                        )
+                                }
+                        }
+                        .font(.caption.bold())
+                        .foregroundColor(.orange)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                        .background(.orange.opacity(0.2))
+                    }
+
+                    ScrollView {
+                        Text((abbreviated ? "...\n\n" : "") + log)
+                            .font(.caption.monospaced())
+                            .lineSpacing(4)
+                            .padding(8)
+                            .background(
+                                GeometryReader { proxy in
+                                    Color.clear
+                                        .onAppear {
+                                            let height = proxy.size.height
+                                            if height < logHeight {
+                                                logHeight = height
+                                            }
+                                        }
+                                }
+                            )
+                    }
                 }
                 .frame(height: logHeight)
                 .frame(maxWidth: .infinity, alignment: .leading)

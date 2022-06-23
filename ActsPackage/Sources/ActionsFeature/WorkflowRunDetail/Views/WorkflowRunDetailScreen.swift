@@ -15,6 +15,9 @@ struct WorkflowRunDetailScreen: View {
                             step: workflowStep,
                             onTap: {
                                 await viewModel.onStepTapped(job: workflowJob, step: workflowStep)
+                            },
+                            onSeeEntireLogTapped: {
+                                await viewModel.onSeeEntireLogTapped(job: workflowJob)
                             }
                         )
                     }
