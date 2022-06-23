@@ -111,10 +111,16 @@ public struct GitHubWorkflowJob: Codable, Identifiable {
 }
 
 public struct GitHubWorkflowStep: Codable, Identifiable {
+    public enum LogState {
+        case notLoaded
+        case loading
+        case loaded(log: String, abbreviated: Bool)
+    }
+
     public var number: Int
     public var name: String
-    // filled when needed
-    public var log: String? = nil
+    // changed by user interaction
+    public var log: LogState = .notLoaded
 
     private var status: String
     private var conclusion: String?
@@ -124,11 +130,23 @@ public struct GitHubWorkflowStep: Codable, Identifiable {
     }
 
     public var hasLog: Bool {
-        log != nil
+        switch log {
+        case .loaded:
+            return true
+        default:
+            return false
+        }
     }
 
     public var stepStatus: Status {
         Status(rawStatus: status, conclusion: conclusion)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case number
+        case name
+        case status
+        case conclusion
     }
 }
 

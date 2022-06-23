@@ -10,9 +10,20 @@ struct WorkflowStepView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Image(systemName: step.hasLog ? "chevron.down" : "chevron.right")
-                    .font(.system(size: 12))
-                    .frame(width: 18, alignment: .leading)
+                Group {
+                    switch step.log {
+                    case .notLoaded:
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12))
+                    case .loading:
+                        ProgressView()
+                            .frame(width: 12, height: 12)
+                    case .loaded:
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 12))
+                    }
+                }
+                .frame(width: 18, alignment: .leading)
 
                 Text(step.name)
             }
@@ -24,7 +35,7 @@ struct WorkflowStepView: View {
                 }
             }
 
-            if let log = step.log {
+            if case let .loaded(log, abbreviated) = step.log {
                 ScrollView {
                     Text(log)
                         .font(.caption.monospaced())
