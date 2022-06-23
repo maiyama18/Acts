@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 public enum Status {
     case queued
@@ -54,6 +55,21 @@ public enum Status {
             return "TimedOut"
         case let .other(raw):
             return raw
+        }
+    }
+
+    public func iconImage() -> some View {
+        switch self {
+        case .queued, .inProgress:
+            return Image(systemName: "circle.fill").foregroundColor(.yellow)
+        case .succeeded:
+            return Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+        case .failed, .timedOut:
+            return Image(systemName: "xmark.circle.fill").foregroundColor(.red)
+        case .skipped:
+            return Image(systemName: "slash.circle.fill").foregroundColor(.gray)
+        case .cancelled, .other:
+            return Image(systemName: "exclamationmark.circle.fill").foregroundColor(.gray)
         }
     }
 }

@@ -10,7 +10,7 @@ struct WorkflowStepView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
+            HStack(spacing: 4) {
                 Group {
                     switch step.log {
                     case .notLoaded:
@@ -24,7 +24,9 @@ struct WorkflowStepView: View {
                             .font(.system(size: 12))
                     }
                 }
-                .frame(width: 18, alignment: .leading)
+                .frame(width: 16, alignment: .leading)
+
+                step.stepStatus.iconImage()
 
                 Text(step.name)
             }
