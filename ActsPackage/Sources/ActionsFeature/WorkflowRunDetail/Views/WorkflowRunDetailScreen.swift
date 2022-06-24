@@ -8,16 +8,25 @@ struct WorkflowRunDetailScreen: View {
         List {
             ForEach(viewModel.workflowJobs) { workflowJob in
                 VStack(alignment: .leading) {
-                    HStack(spacing: 4) {
-                        workflowJob.jobStatus.iconImage()
+                    HStack {
+                        VStack(alignment: .leading) {
+                            HStack(spacing: 4) {
+                                workflowJob.jobStatus.iconImage()
 
-                        Text(workflowJob.name)
-                            .bold()
+                                Text(workflowJob.name)
+                                    .bold()
+                            }
+                            .font(.title2)
+
+                            Text(workflowJob.jobStatus.formatted())
+                                .font(.callout)
+                        }
+
+                        Spacer()
+
+                        Text(workflowJob.formattedDuration)
+                            .font(.callout.monospaced().bold())
                     }
-                    .font(.title2)
-
-                    Text(workflowJob.jobStatus.formatted())
-                        .font(.callout)
 
                     ForEach(workflowJob.steps) { workflowStep in
                         WorkflowStepView(

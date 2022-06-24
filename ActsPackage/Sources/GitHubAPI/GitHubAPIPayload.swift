@@ -118,12 +118,18 @@ public struct GitHubWorkflowJob: Codable, Identifiable {
     public var name: String
     public var htmlUrl: String
     public var steps: [GitHubWorkflowStep]
+    public var startedAt: Date
+    public var completedAt: Date
 
     private var status: String
     private var conclusion: String?
 
     public var jobStatus: Status {
         Status(rawStatus: status, conclusion: conclusion)
+    }
+
+    public var formattedDuration: String {
+        formatDuration(startedAt: startedAt, completedAt: completedAt)
     }
 }
 
@@ -160,7 +166,7 @@ public struct GitHubWorkflowStep: Codable, Identifiable {
     public var stepStatus: Status {
         Status(rawStatus: status, conclusion: conclusion)
     }
-    
+
     public var formattedDuration: String {
         formatDuration(startedAt: startedAt, completedAt: completedAt)
     }
@@ -193,11 +199,10 @@ public struct GitHubWorkflowStepLog {
 func formatDuration(startedAt: Date, completedAt: Date) -> String {
     let duration = max(0, Int(completedAt.timeIntervalSince1970 - startedAt.timeIntervalSince1970))
     let (h, m, s) = (duration / 3600, (duration % 3600) / 60, (duration % 3600) % 60)
-    
+
     return [
         h > 0 ? "\(h)h" : "",
         m > 0 ? "\(m)m" : "",
         "\(s)s",
     ].joined(separator: " ")
 }
-
