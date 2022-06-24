@@ -239,6 +239,8 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
             logger.notice("GitHub request unauthorized")
             try secureStorage.removeToken()
             throw GitHubAPIError.unauthorized
+        case 404:
+            throw GitHubAPIError.notFound
         default:
             logger.notice("GitHub request failed: \(response.debugDescription)")
             throw GitHubAPIError.unexpectedError

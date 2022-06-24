@@ -78,7 +78,12 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
             workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .loaded(log: stepLog.log, abbreviated: stepLog.abbreviated)
         } catch {
             workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .notLoaded
-            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+            switch error {
+            case GitHubAPIError.notFound:
+                await events.send(.showError(message: L10n.ErrorMessage.logUnavailable))
+            default:
+                await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+            }
         }
     }
 

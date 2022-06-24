@@ -5,6 +5,7 @@
 
 "error_message.unexpected_error" = "Unexpected error occurred";
 "error_message.disconnected" = "Network disconnected";
+"error_message.log_unavailable" = "Log of this workflow is currently unavailable";
 "error_message.sign_out_failed" = "Sign out unexpectedly failed. Please revoke OAuth token from github settings instead. Sorry!";
 
 "sign_in_feature.sign_in_with_github" = "Sign In with GitHub";
