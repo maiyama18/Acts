@@ -19,11 +19,11 @@ public final class RepositoryListViewModel: ObservableObject {
     let events: AsyncChannel<Event> = .init()
 
     private let gitHubUseCase: GitHubUseCaseProtocol
-    private let secureStorage: SecureStorageProtocol
+    private let cacheClient: CacheClientProtocol
 
-    public init(gitHubUseCase: GitHubUseCaseProtocol, secureStorage: SecureStorageProtocol) {
+    public init(gitHubUseCase: GitHubUseCaseProtocol, cacheClient: CacheClientProtocol) {
         self.gitHubUseCase = gitHubUseCase
-        self.secureStorage = secureStorage
+        self.cacheClient = cacheClient
     }
 
     func onViewLoaded() async {
@@ -43,6 +43,8 @@ public final class RepositoryListViewModel: ObservableObject {
                 await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             }
         }
+
+        cacheClient.deletePreviousDaysGitHubWorkflowStepLogObjects()
     }
 
     func onRepositoryTapped(repository: GitHubRepository) async {

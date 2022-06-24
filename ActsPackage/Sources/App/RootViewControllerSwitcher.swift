@@ -25,7 +25,7 @@ public final class RootViewControllerSwitcher {
         if secureStorage.getToken() != nil {
             let viewModel = RepositoryListViewModel(
                 gitHubUseCase: GitHubUseCase.shared,
-                secureStorage: SecureStorage.shared
+                cacheClient: CacheClient.shared
             )
             window.rootViewController = UINavigationController(rootViewController: RepositoryListViewController(viewModel: viewModel))
         } else {

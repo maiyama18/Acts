@@ -1,8 +1,10 @@
+import Foundation
 import RealmSwift
 
 public protocol CacheClientProtocol {
     func getGitHubWorkflowStepLogObject(id: String) -> GitHubWorkflowStepLogObject?
     func saveGitHubWorkflowStepLogObject(object: GitHubWorkflowStepLogObject)
+    func deletePreviousDaysGitHubWorkflowStepLogObjects()
 }
 
 public class CacheClient: CacheClientProtocol {
@@ -22,6 +24,20 @@ public class CacheClient: CacheClientProtocol {
             }
         } catch {
             logger.error("failed to write to realm: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    public func deletePreviousDaysGitHubWorkflowStepLogObjects() {
+        guard let realm = getInstance() else { return }
+        do {
+            try realm.write {
+                let previousDaysLogObjects = realm.objects(GitHubWorkflowStepLogObject.self).where {
+                    $0.createdAt < Date().addingTimeInterval(-24 * 60 * 60)
+                }
+                realm.delete(previousDaysLogObjects)
+            }
+        } catch {
+            logger.error("failed to delete realm records: \(String(describing: error), privacy: .public)")
         }
     }
 
