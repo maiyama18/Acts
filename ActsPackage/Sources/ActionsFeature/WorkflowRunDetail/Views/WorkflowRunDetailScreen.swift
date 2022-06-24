@@ -9,17 +9,17 @@ struct WorkflowRunDetailScreen: View {
             ForEach(viewModel.workflowJobs) { workflowJob in
                 VStack(alignment: .leading) {
                     HStack {
+                        workflowJob.jobStatus.iconImage()
+                            .font(.title)
+
                         VStack(alignment: .leading) {
-                            HStack(spacing: 4) {
-                                workflowJob.jobStatus.iconImage()
+                            Text(workflowJob.name)
+                                .font(.title2.bold())
+                                .bold()
 
-                                Text(workflowJob.name)
-                                    .bold()
-                            }
-                            .font(.title2)
-
-                            Text(workflowJob.jobStatus.formatted())
-                                .font(.callout)
+                            Text(workflowJob.formattedJobStatusWithTime)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
 
                         Spacer()

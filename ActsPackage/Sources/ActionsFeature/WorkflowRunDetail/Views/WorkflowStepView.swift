@@ -34,7 +34,7 @@ struct WorkflowStepView: View {
                 Spacer()
 
                 Text(step.formattedDuration)
-                    .font(.callout.monospaced())
+                    .font(.subheadline.monospaced())
             }
             .padding(.vertical, 4)
             .frame(maxWidth: .infinity, alignment: .leading)

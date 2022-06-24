@@ -66,6 +66,7 @@ public enum Status {
                 .scaleEffect(0.75)
         case .inProgress:
             Image(systemName: "circle.dashed.inset.filled").foregroundColor(.yellow)
+                .rotateForever()
         case .succeeded:
             Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
         case .failed, .timedOut:
@@ -130,6 +131,58 @@ public struct GitHubWorkflowJob: Codable, Identifiable {
 
     public var jobStatus: Status {
         Status(rawStatus: status, conclusion: conclusion)
+    }
+
+    public var formattedJobStatusWithTime: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "YYYY/MM/dd HH:mm"
+
+        switch jobStatus {
+        case .queued:
+            if let startedAt = startedAt {
+                return "Queued at \(startedAt.dateTimeFormatted())"
+            } else {
+                return "Queued"
+            }
+        case .inProgress:
+            if let startedAt = startedAt {
+                return "Started at \(startedAt.dateTimeFormatted())"
+            } else {
+                return "Started"
+            }
+        case .succeeded:
+            if let completedAt = completedAt {
+                return "Succeeded at \(completedAt.dateTimeFormatted())"
+            } else {
+                return "Succeeded"
+            }
+        case .failed:
+            if let completedAt = completedAt {
+                return "Failed at \(completedAt.dateTimeFormatted())"
+            } else {
+                return "Failed"
+            }
+        case .cancelled:
+            if let completedAt = completedAt {
+                return "Cancelled at \(completedAt.dateTimeFormatted())"
+            } else {
+                return "Cancelled"
+            }
+        case .skipped:
+            if let completedAt = completedAt {
+                return "Skipped at \(completedAt.dateTimeFormatted())"
+            } else {
+                return "Skipped"
+            }
+        case .timedOut:
+            if let completedAt = completedAt {
+                return "Timed out at \(completedAt.dateTimeFormatted())"
+            } else {
+                return "Timed out"
+            }
+        case let .other(raw: raw):
+            return raw
+        }
     }
 
     public var formattedDuration: String {
