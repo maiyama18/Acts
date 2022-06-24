@@ -203,6 +203,8 @@ public struct GitHubWorkflowStep: Codable, Identifiable {
     public var completedAt: Date?
     // changed by user interaction
     public var log: LogState = .notLoaded
+    // filled by github usecase
+    public var job: GitHubWorkflowJob!
 
     private var status: String
     private var conclusion: String?

@@ -33,7 +33,13 @@ public final class GitHubUseCase: GitHubUseCaseProtocol {
     }
 
     public func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs {
-        try await apiClient.getWorkflowJobs(workflowRun: workflowRun)
+        var response = try await apiClient.getWorkflowJobs(workflowRun: workflowRun)
+        for jobIndex in response.jobs.indices {
+            for stepIndex in response.jobs[jobIndex].steps.indices {
+                response.jobs[jobIndex].steps[stepIndex].job = response.jobs[jobIndex]
+            }
+        }
+        return response
     }
 
     public func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog] {
