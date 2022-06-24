@@ -5,7 +5,7 @@ public protocol GitHubUseCaseProtocol {
     func getRepositories() async throws -> [GitHubRepository]
     func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns
     func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs
-    func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog]
+    func getWorkflowStepLog(step: GitHubWorkflowStep, logsUrl: String, maxLines: Int) async throws -> GitHubWorkflowStepLog?
     func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws
     func cancelWorkflow(workflowRun: GitHubWorkflowRun) async throws
 }
@@ -42,8 +42,12 @@ public final class GitHubUseCase: GitHubUseCaseProtocol {
         return response
     }
 
-    public func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog] {
-        try await apiClient.getWorkflowJobsLog(logsUrl: logsUrl, maxLines: maxLines)
+    public func getWorkflowStepLog(step: GitHubWorkflowStep, logsUrl: String, maxLines: Int) async throws -> GitHubWorkflowStepLog? {
+        let response = try await apiClient.getWorkflowJobsLog(logsUrl: logsUrl, maxLines: maxLines)
+        guard let stepLog = response[step.job.name]?.stepLogs.first(where: { $0.stepNumber == step.number }) else {
+            return nil
+        }
+        return stepLog
     }
 
     public func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws {

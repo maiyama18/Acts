@@ -70,8 +70,8 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
 
         do {
             workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .loading
-            let response = try await gitHubUseCase.getWorkflowJobsLog(logsUrl: workflowRun.logsUrl, maxLines: 100)
-            guard let stepLog = response[job.name]?.stepLogs.first(where: { $0.stepNumber == step.number }) else {
+            let stepLog = try await gitHubUseCase.getWorkflowStepLog(step: step, logsUrl: workflowRun.logsUrl, maxLines: 100)
+            guard let stepLog = stepLog else {
                 workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .notLoaded
                 return
             }
