@@ -136,6 +136,8 @@ public struct GitHubWorkflowStep: Codable, Identifiable {
 
     public var number: Int
     public var name: String
+    public var startedAt: Date
+    public var completedAt: Date
     // changed by user interaction
     public var log: LogState = .notLoaded
 
@@ -158,10 +160,16 @@ public struct GitHubWorkflowStep: Codable, Identifiable {
     public var stepStatus: Status {
         Status(rawStatus: status, conclusion: conclusion)
     }
+    
+    public var formattedDuration: String {
+        formatDuration(startedAt: startedAt, completedAt: completedAt)
+    }
 
     enum CodingKeys: String, CodingKey {
         case number
         case name
+        case startedAt
+        case completedAt
         case status
         case conclusion
     }
@@ -181,3 +189,15 @@ public struct GitHubWorkflowStepLog {
     public var log: String
     public var abbreviated: Bool
 }
+
+func formatDuration(startedAt: Date, completedAt: Date) -> String {
+    let duration = max(0, Int(completedAt.timeIntervalSince1970 - startedAt.timeIntervalSince1970))
+    let (h, m, s) = (duration / 3600, (duration % 3600) / 60, (duration % 3600) % 60)
+    
+    return [
+        h > 0 ? "\(h)h" : "",
+        m > 0 ? "\(m)m" : "",
+        "\(s)s",
+    ].joined(separator: " ")
+}
+

@@ -9,7 +9,7 @@ struct WorkflowStepView: View {
     @State private var logHeight: CGFloat = 300
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
                 Group {
                     switch step.log {
@@ -29,6 +29,12 @@ struct WorkflowStepView: View {
                 step.stepStatus.iconImage()
 
                 Text(step.name)
+                    .font(.callout)
+
+                Spacer()
+
+                Text(step.formattedDuration())
+                    .font(.callout.monospaced())
             }
             .padding(.vertical, 4)
             .frame(maxWidth: .infinity, alignment: .leading)
