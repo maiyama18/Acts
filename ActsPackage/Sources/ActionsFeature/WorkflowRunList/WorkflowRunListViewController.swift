@@ -36,6 +36,7 @@ public final class WorkflowRunListViewController: UIViewController {
     }
 
     private func setupNavigation() {
+        navigationItem.backButtonTitle = ""
         navigationItem.title = viewModel.title
     }
 

@@ -15,15 +15,32 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
     public static let shared: GitHubAPIClient = .init(secureStorage: SecureStorage.shared)
 
     private let secureStorage: SecureStorageProtocol
-    private let jsonDecoder: JSONDecoder
-
-    private init(secureStorage: SecureStorageProtocol) {
-        self.secureStorage = secureStorage
+    private let jsonDecoder: JSONDecoder = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
 
         let jsonDecoder = JSONDecoder()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        jsonDecoder.dateDecodingStrategy = .iso8601
-        self.jsonDecoder = jsonDecoder
+        jsonDecoder.dateDecodingStrategy = .custom { decoder -> Date in
+            let container = try decoder.singleValueContainer()
+            let dateStr = try container.decode(String.self)
+
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
+            if let date = formatter.date(from: dateStr) {
+                return date
+            }
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXXXX"
+            if let date = formatter.date(from: dateStr) {
+                return date
+            }
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "invalid date formatted: \(dateStr)")
+        }
+
+        return jsonDecoder
+    }()
+
+    private init(secureStorage: SecureStorageProtocol) {
+        self.secureStorage = secureStorage
     }
 
     public func getRepositories() async throws -> [GitHubRepository] {

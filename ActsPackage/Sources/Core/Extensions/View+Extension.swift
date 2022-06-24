@@ -11,4 +11,8 @@ public extension View {
             }
         }
     }
+
+    func rotateForever(duration: Double = 3) -> some View {
+        modifier(RotateForeverModifier(duration: duration))
+    }
 }

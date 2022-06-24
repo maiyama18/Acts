@@ -26,8 +26,13 @@ public final class SignInViewController: UIViewController {
     override public func viewDidLoad() {
         super.viewDidLoad()
 
+        setupNavigation()
         subscribe()
         hostSwiftUIView(SignInScreen(viewModel: viewModel))
+    }
+
+    private func setupNavigation() {
+        navigationItem.backButtonTitle = ""
     }
 
     private func subscribe() {

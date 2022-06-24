@@ -8,13 +8,34 @@ struct WorkflowRunDetailScreen: View {
         List {
             ForEach(viewModel.workflowJobs) { workflowJob in
                 VStack(alignment: .leading) {
-                    Text(workflowJob.name)
-                        .font(.title2.bold())
+                    HStack {
+                        workflowJob.jobStatus.iconImage()
+                            .font(.title)
+
+                        VStack(alignment: .leading) {
+                            Text(workflowJob.name)
+                                .font(.title2.bold())
+                                .bold()
+
+                            Text(workflowJob.formattedJobStatusWithTime)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        Text(workflowJob.formattedDuration)
+                            .font(.callout.monospaced().bold())
+                    }
+
                     ForEach(workflowJob.steps) { workflowStep in
                         WorkflowStepView(
                             step: workflowStep,
                             onTap: {
                                 await viewModel.onStepTapped(job: workflowJob, step: workflowStep)
+                            },
+                            onSeeEntireLogTapped: {
+                                await viewModel.onSeeEntireLogTapped(job: workflowJob)
                             }
                         )
                     }

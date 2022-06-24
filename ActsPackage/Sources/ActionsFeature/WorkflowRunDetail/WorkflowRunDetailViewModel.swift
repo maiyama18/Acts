@@ -8,6 +8,7 @@ import SwiftUI
 public final class WorkflowRunDetailViewModel: ObservableObject {
     enum Event {
         case requestSent(action: String)
+        case openOnBrowser(url: URL)
         case unauthorized
         case showError(message: String)
     }
@@ -57,29 +58,25 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     }
 
     func onStepTapped(job: GitHubWorkflowJob, step: GitHubWorkflowStep) async {
+        guard let indices = findWorkflowJobsIndices(job: job, step: step) else {
+            return
+        }
+
         guard !step.hasLog else {
-            for jobIndex in workflowJobs.indices {
-                for stepIndex in workflowJobs[jobIndex].steps.indices {
-                    guard workflowJobs[jobIndex].steps[stepIndex].id == step.id else { continue }
-                    workflowJobs[jobIndex].steps[stepIndex].log = nil
-                }
-            }
+            workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .notLoaded
             return
         }
 
         do {
+            workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .loading
             let response = try await gitHubAPIClient.getWorkflowJobsLog(workflowRun: workflowRun, jobNames: workflowJobs.map(\.name), maxLines: 100)
             guard let stepLog = response[job.name]?.stepLogs.first(where: { $0.stepNumber == step.number }) else {
+                workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .notLoaded
                 return
             }
-            for jobIndex in workflowJobs.indices {
-                guard workflowJobs[jobIndex].id == job.id else { continue }
-                for stepIndex in workflowJobs[jobIndex].steps.indices {
-                    guard workflowJobs[jobIndex].steps[stepIndex].id == step.id else { continue }
-                    workflowJobs[jobIndex].steps[stepIndex].log = stepLog.log
-                }
-            }
+            workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .loaded(log: stepLog.log, abbreviated: stepLog.abbreviated)
         } catch {
+            workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .notLoaded
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
         }
     }
@@ -100,5 +97,21 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
         } catch {
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
         }
+    }
+
+    func onSeeEntireLogTapped(job: GitHubWorkflowJob) async {
+        guard let url = URL(string: job.htmlUrl) else { return }
+        await events.send(.openOnBrowser(url: url))
+    }
+
+    private func findWorkflowJobsIndices(job: GitHubWorkflowJob, step: GitHubWorkflowStep) -> (jobIndex: Int, stepIndex: Int)? {
+        for jobIndex in workflowJobs.indices {
+            guard workflowJobs[jobIndex].id == job.id else { continue }
+            for stepIndex in workflowJobs[jobIndex].steps.indices {
+                guard workflowJobs[jobIndex].steps[stepIndex].id == step.id else { continue }
+                return (jobIndex, stepIndex)
+            }
+        }
+        return nil
     }
 }

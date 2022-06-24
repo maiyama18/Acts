@@ -35,6 +35,7 @@ final class WorkflowRunDetailViewController: UIViewController {
     }
 
     private func setupNavigation() {
+        navigationItem.backButtonTitle = ""
         navigationItem.title = viewModel.title
         navigationItem.rightBarButtonItem = .init(
             title: viewModel.primaryAction.label,
@@ -54,6 +55,8 @@ final class WorkflowRunDetailViewController: UIViewController {
                         from: self,
                         message: L10n.ActionsFeature.Message.workflowRequestSent(action)
                     )
+                case let .openOnBrowser(url):
+                    await UIApplication.shared.open(url)
                 case .unauthorized:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case let .showError(message):

@@ -40,6 +40,7 @@ public final class RepositoryListViewController: UIViewController {
     }
 
     private func setupNavigation() {
+        navigationItem.backButtonTitle = ""
         navigationItem.title = L10n.ActionsFeature.Title.repositoryList
         navigationItem.leftBarButtonItem = .init(
             image: UIImage(systemName: "gearshape"),
