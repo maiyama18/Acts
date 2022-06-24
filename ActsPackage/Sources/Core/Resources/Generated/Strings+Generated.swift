@@ -38,6 +38,8 @@ public enum L10n {
   public enum ErrorMessage {
     /// Network disconnected
     public static let disconnected = L10n.tr("Localizable", "error_message.disconnected")
+    /// Log of this workflow is currently unavailable
+    public static let logUnavailable = L10n.tr("Localizable", "error_message.log_unavailable")
     /// Sign out unexpectedly failed. Please revoke OAuth token from github settings instead. Sorry!
     public static let signOutFailed = L10n.tr("Localizable", "error_message.sign_out_failed")
     /// Unexpected error occurred

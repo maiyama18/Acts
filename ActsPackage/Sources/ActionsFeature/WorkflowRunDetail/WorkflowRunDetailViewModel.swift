@@ -1,6 +1,7 @@
 import AsyncAlgorithms
 import Combine
 import Core
+import GitHub
 import GitHubAPI
 import SwiftUI
 
@@ -18,7 +19,7 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     let events: AsyncChannel<Event> = .init()
 
     private let workflowRun: GitHubWorkflowRun
-    private let gitHubAPIClient: GitHubAPIClientProtocol
+    private let gitHubUseCase: GitHubUseCaseProtocol
 
     var title: String {
         "\(workflowRun.name) #\(workflowRun.runNumber)"
@@ -35,15 +36,15 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
 
     public init(
         workflowRun: GitHubWorkflowRun,
-        gitHubAPIClient: GitHubAPIClientProtocol
+        gitHubUseCase: GitHubUseCaseProtocol
     ) {
         self.workflowRun = workflowRun
-        self.gitHubAPIClient = gitHubAPIClient
+        self.gitHubUseCase = gitHubUseCase
     }
 
     func onViewLoaded() async {
         do {
-            let response = try await gitHubAPIClient.getWorkflowJobs(workflowRun: workflowRun)
+            let response = try await gitHubUseCase.getWorkflowJobs(workflowRun: workflowRun)
             workflowJobs = response.jobs
         } catch {
             switch error {
@@ -69,21 +70,26 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
 
         do {
             workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .loading
-            let response = try await gitHubAPIClient.getWorkflowJobsLog(workflowRun: workflowRun, jobNames: workflowJobs.map(\.name), maxLines: 100)
-            guard let stepLog = response[job.name]?.stepLogs.first(where: { $0.stepNumber == step.number }) else {
+            let stepLog = try await gitHubUseCase.getWorkflowStepLog(step: step, logsUrl: workflowRun.logsUrl, maxLines: 100)
+            guard let stepLog = stepLog else {
                 workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .notLoaded
                 return
             }
             workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .loaded(log: stepLog.log, abbreviated: stepLog.abbreviated)
         } catch {
             workflowJobs[indices.jobIndex].steps[indices.stepIndex].log = .notLoaded
-            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+            switch error {
+            case GitHubAPIError.notFound:
+                await events.send(.showError(message: L10n.ErrorMessage.logUnavailable))
+            default:
+                await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+            }
         }
     }
 
     func onRerunTapped() async {
         do {
-            try await gitHubAPIClient.rerunWorkflow(workflowRun: workflowRun)
+            try await gitHubUseCase.rerunWorkflow(workflowRun: workflowRun)
             await events.send(.requestSent(action: "Re-run"))
         } catch {
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
@@ -92,7 +98,7 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
 
     func onCancelTapped() async {
         do {
-            try await gitHubAPIClient.cancelWorkflow(workflowRun: workflowRun)
+            try await gitHubUseCase.cancelWorkflow(workflowRun: workflowRun)
             await events.send(.requestSent(action: "Cancel"))
         } catch {
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))

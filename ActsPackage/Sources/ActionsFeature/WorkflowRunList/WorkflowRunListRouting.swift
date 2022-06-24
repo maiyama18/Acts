@@ -1,3 +1,4 @@
+import GitHub
 import GitHubAPI
 import UIKit
 
@@ -10,7 +11,7 @@ public extension WorkflowRunListRouting {
     func pushWorkflowRunListView(from originVC: UIViewController, repository: GitHubRepository) {
         let viewModel = WorkflowRunListViewModel(
             repository: repository,
-            gitHubAPIClient: GitHubAPIClient.shared
+            gitHubUseCase: GitHubUseCase.shared
         )
         let destinationVC = WorkflowRunListViewController(viewModel: viewModel)
         originVC.navigationController?.pushViewController(destinationVC, animated: true)

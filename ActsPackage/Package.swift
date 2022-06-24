@@ -17,6 +17,7 @@ let package = Package(
         .package(url: "https://github.com/kishikawakatsumi/KeychainAccess", exact: "4.2.2"),
         .package(url: "https://github.com/pkluz/PKHUD", exact: "5.4.0"),
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: "0.9.14"),
+        .package(url: "https://github.com/realm/realm-swift", exact: "10.28.1"),
     ],
     targets: [
         .target(name: "App", dependencies: ["SignInFeature", "ActionsFeature"]),
@@ -32,7 +33,7 @@ let package = Package(
             name: "ActionsFeature",
             dependencies: [
                 "SettingsFeature",
-                "GitHubAPI",
+                "GitHub",
                 "Core",
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
             ]
@@ -43,6 +44,12 @@ let package = Package(
                 "AuthAPI",
                 "Core",
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
+            ]
+        ),
+        .target(
+            name: "GitHub",
+            dependencies: [
+                "GitHubAPI",
             ]
         ),
         .target(name: "AuthAPI"),
@@ -58,6 +65,7 @@ let package = Package(
             dependencies: [
                 .product(name: "KeychainAccess", package: "KeychainAccess"),
                 .product(name: "PKHUD", package: "PKHUD"),
+                .product(name: "RealmSwift", package: "realm-swift"),
             ],
             resources: [
                 .process("Resources/Localizable.strings"),

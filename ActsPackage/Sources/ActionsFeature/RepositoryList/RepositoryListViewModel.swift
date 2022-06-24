@@ -1,6 +1,7 @@
 import AsyncAlgorithms
 import Combine
 import Core
+import GitHub
 import GitHubAPI
 
 @MainActor
@@ -17,12 +18,12 @@ public final class RepositoryListViewModel: ObservableObject {
 
     let events: AsyncChannel<Event> = .init()
 
-    private let gitHubAPIClient: GitHubAPIClientProtocol
-    private let secureStorage: SecureStorageProtocol
+    private let gitHubUseCase: GitHubUseCaseProtocol
+    private let cacheClient: CacheClientProtocol
 
-    public init(gitHubAPIClient: GitHubAPIClientProtocol, secureStorage: SecureStorageProtocol) {
-        self.gitHubAPIClient = gitHubAPIClient
-        self.secureStorage = secureStorage
+    public init(gitHubUseCase: GitHubUseCaseProtocol, cacheClient: CacheClientProtocol) {
+        self.gitHubUseCase = gitHubUseCase
+        self.cacheClient = cacheClient
     }
 
     func onViewLoaded() async {
@@ -31,7 +32,7 @@ public final class RepositoryListViewModel: ObservableObject {
             showingHUD = false
         }
         do {
-            repositories = try await gitHubAPIClient.getRepositories()
+            repositories = try await gitHubUseCase.getRepositories()
         } catch {
             switch error {
             case GitHubAPIError.unauthorized:
@@ -42,6 +43,8 @@ public final class RepositoryListViewModel: ObservableObject {
                 await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
             }
         }
+
+        cacheClient.deletePreviousDaysGitHubWorkflowStepLogObjects()
     }
 
     func onRepositoryTapped(repository: GitHubRepository) async {

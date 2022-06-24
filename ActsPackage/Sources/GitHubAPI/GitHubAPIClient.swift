@@ -6,7 +6,7 @@ public protocol GitHubAPIClientProtocol {
     func getRepositories() async throws -> [GitHubRepository]
     func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns
     func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs
-    func getWorkflowJobsLog(workflowRun: GitHubWorkflowRun, jobNames: [String], maxLines: Int) async throws -> [String: GitHubWorkflowJobLog]
+    func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog]
     func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws
     func cancelWorkflow(workflowRun: GitHubWorkflowRun) async throws
 }
@@ -55,8 +55,8 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         try await request(urlString: workflowRun.jobsUrl, method: "GET")
     }
 
-    public func getWorkflowJobsLog(workflowRun: GitHubWorkflowRun, jobNames: [String], maxLines: Int) async throws -> [String: GitHubWorkflowJobLog] {
-        let zipFileURL = try await download(urlString: workflowRun.logsUrl)
+    public func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog] {
+        let zipFileURL = try await download(urlString: logsUrl)
         let destinationDirectoryURL = URL(
             fileURLWithPath: NSTemporaryDirectory().appending("logs-\(Date().timeIntervalSince1970)"),
             isDirectory: true
@@ -70,9 +70,10 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         try fileManager.unzipItem(at: zipFileURL, to: destinationDirectoryURL)
 
         var jobLogs: [String: GitHubWorkflowJobLog] = [:]
-        for jobName in jobNames {
+        for jobDirectory in try fileManager.subDirectoriesOfDirectory(at: destinationDirectoryURL) {
+            let jobName = jobDirectory.lastPathComponent
             let stepLogFiles = try fileManager.contentsOfDirectory(
-                at: destinationDirectoryURL.appendingPathComponent(jobName),
+                at: jobDirectory,
                 includingPropertiesForKeys: nil
             )
 
@@ -238,6 +239,8 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
             logger.notice("GitHub request unauthorized")
             try secureStorage.removeToken()
             throw GitHubAPIError.unauthorized
+        case 404:
+            throw GitHubAPIError.notFound
         default:
             logger.notice("GitHub request failed: \(response.debugDescription)")
             throw GitHubAPIError.unexpectedError
