@@ -58,18 +58,22 @@ public enum Status {
         }
     }
 
+    @ViewBuilder
     public func iconImage() -> some View {
         switch self {
-        case .queued, .inProgress:
-            return Image(systemName: "circle.fill").foregroundColor(.yellow)
+        case .queued:
+            Image(systemName: "circle.fill").foregroundColor(.yellow)
+                .scaleEffect(0.75)
+        case .inProgress:
+            Image(systemName: "circle.dashed.inset.filled").foregroundColor(.yellow)
         case .succeeded:
-            return Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+            Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
         case .failed, .timedOut:
-            return Image(systemName: "xmark.circle.fill").foregroundColor(.red)
+            Image(systemName: "xmark.circle.fill").foregroundColor(.red)
         case .skipped:
-            return Image(systemName: "slash.circle.fill").foregroundColor(.gray)
+            Image(systemName: "slash.circle.fill").foregroundColor(.gray)
         case .cancelled, .other:
-            return Image(systemName: "exclamationmark.circle.fill").foregroundColor(.gray)
+            Image(systemName: "exclamationmark.circle.fill").foregroundColor(.gray)
         }
     }
 }
