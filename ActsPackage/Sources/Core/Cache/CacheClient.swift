@@ -1,34 +1,33 @@
 import RealmSwift
 
 public protocol CacheClientProtocol {
-    func getGitHubWorkflowStepLogObject(id: Int) -> GitHubWorkflowStepLogObject?
-    func saveGitHubWorkflowStepLogObject(id: Int, log: String, abbreviated: Bool)
+    func getGitHubWorkflowStepLogObject(id: String) -> GitHubWorkflowStepLogObject?
+    func saveGitHubWorkflowStepLogObject(object: GitHubWorkflowStepLogObject)
 }
 
 public class CacheClient: CacheClientProtocol {
     public static let shared: CacheClient = .init()
 
-    private let realm: Realm?
+    private init() {}
 
-    private init() {
+    public func getGitHubWorkflowStepLogObject(id: String) -> GitHubWorkflowStepLogObject? {
+        getInstance()?.object(ofType: GitHubWorkflowStepLogObject.self, forPrimaryKey: id)
+    }
+
+    public func saveGitHubWorkflowStepLogObject(object: GitHubWorkflowStepLogObject) {
+        guard let realm = getInstance() else { return }
         do {
-            realm = try Realm(
-                configuration: Realm.Configuration(inMemoryIdentifier: "acts")
-            )
+            try realm.write {
+                realm.add(object)
+            }
         } catch {
-            logger.error("Failed to initialize realm instance: \(String(describing: error), privacy: .public)")
-            realm = nil
+            logger.error("failed to write to realm: \(String(describing: error), privacy: .public)")
         }
     }
 
-    public func getGitHubWorkflowStepLogObject(id: Int) -> GitHubWorkflowStepLogObject? {
-        realm?.object(ofType: GitHubWorkflowStepLogObject.self, forPrimaryKey: id)
-    }
-
-    public func saveGitHubWorkflowStepLogObject(id: Int, log: String, abbreviated: Bool) {
-        realm?.writeAsync {
-            let object = GitHubWorkflowStepLogObject(id: id, log: log, abbreviated: abbreviated)
-            self.realm?.add(object)
-        }
+    private func getInstance() -> Realm? {
+        try? Realm(
+            configuration: Realm.Configuration(deleteRealmIfMigrationNeeded: true)
+        )
     }
 }

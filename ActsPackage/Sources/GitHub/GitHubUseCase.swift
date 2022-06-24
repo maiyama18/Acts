@@ -43,11 +43,19 @@ public final class GitHubUseCase: GitHubUseCaseProtocol {
     }
 
     public func getWorkflowStepLog(step: GitHubWorkflowStep, logsUrl: String, maxLines: Int) async throws -> GitHubWorkflowStepLog? {
-        let response = try await apiClient.getWorkflowJobsLog(logsUrl: logsUrl, maxLines: maxLines)
-        guard let stepLog = response[step.job.name]?.stepLogs.first(where: { $0.stepNumber == step.number }) else {
-            return nil
+        if let cacheObject = cacheClient.getGitHubWorkflowStepLogObject(id: step.runId) {
+            return GitHubWorkflowStepLog(stepNumber: step.number, log: cacheObject.log, abbreviated: cacheObject.abbreviated)
         }
-        return stepLog
+
+        let response = try await apiClient.getWorkflowJobsLog(logsUrl: logsUrl, maxLines: maxLines)
+        guard let stepLogs = response[step.job.name]?.stepLogs else { return nil }
+
+        for stepLog in stepLogs {
+            let runId = GitHubWorkflowStep.generateRunId(jobRunId: step.job.runId, stepNumber: stepLog.stepNumber)
+            cacheClient.saveGitHubWorkflowStepLogObject(object: stepLog.toCacheObject(id: runId))
+        }
+
+        return stepLogs.first(where: { $0.stepNumber == step.number })
     }
 
     public func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws {

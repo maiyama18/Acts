@@ -1,3 +1,4 @@
+import Core
 import Foundation
 import SwiftUI
 
@@ -120,6 +121,7 @@ public struct GitHubWorkflowJobs: Codable {
 
 public struct GitHubWorkflowJob: Codable, Identifiable {
     public var id: Int
+    public var runId: Int
     public var name: String
     public var htmlUrl: String
     public var steps: [GitHubWorkflowStep]
@@ -191,6 +193,10 @@ public struct GitHubWorkflowJob: Codable, Identifiable {
 }
 
 public struct GitHubWorkflowStep: Codable, Identifiable {
+    public static func generateRunId(jobRunId: Int, stepNumber: Int) -> String {
+        "\(jobRunId)-\(stepNumber)"
+    }
+
     public enum LogState {
         case notLoaded
         case loading
@@ -211,6 +217,10 @@ public struct GitHubWorkflowStep: Codable, Identifiable {
 
     public var id: Int {
         number
+    }
+
+    public var runId: String {
+        Self.generateRunId(jobRunId: job.runId, stepNumber: number)
     }
 
     public var hasLog: Bool {
@@ -253,6 +263,18 @@ public struct GitHubWorkflowStepLog {
     public var stepNumber: Int
     public var log: String
     public var abbreviated: Bool
+
+    public init(stepNumber: Int, log: String, abbreviated: Bool) {
+        self.stepNumber = stepNumber
+        self.log = log
+        self.abbreviated = abbreviated
+    }
+}
+
+public extension GitHubWorkflowStepLog {
+    func toCacheObject(id: String) -> GitHubWorkflowStepLogObject {
+        GitHubWorkflowStepLogObject(id: id, stepNumber: stepNumber, log: log, abbreviated: abbreviated)
+    }
 }
 
 func formatDuration(startedAt: Date?, completedAt: Date?) -> String {
