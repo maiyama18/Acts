@@ -5,7 +5,7 @@ public protocol GitHubUseCaseProtocol {
     func getRepositories() async throws -> [GitHubRepository]
     func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns
     func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs
-    func getWorkflowJobsLog(workflowRun: GitHubWorkflowRun, jobNames: [String], maxLines: Int) async throws -> [String: GitHubWorkflowJobLog]
+    func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog]
     func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws
     func cancelWorkflow(workflowRun: GitHubWorkflowRun) async throws
 }
@@ -36,8 +36,8 @@ public final class GitHubUseCase: GitHubUseCaseProtocol {
         try await apiClient.getWorkflowJobs(workflowRun: workflowRun)
     }
 
-    public func getWorkflowJobsLog(workflowRun: GitHubWorkflowRun, jobNames: [String], maxLines: Int) async throws -> [String: GitHubWorkflowJobLog] {
-        try await apiClient.getWorkflowJobsLog(workflowRun: workflowRun, jobNames: jobNames, maxLines: maxLines)
+    public func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog] {
+        try await apiClient.getWorkflowJobsLog(logsUrl: logsUrl, maxLines: maxLines)
     }
 
     public func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws {
