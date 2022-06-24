@@ -8,6 +8,8 @@ struct WorkflowStepView: View {
 
     @State private var logHeight: CGFloat = 300
 
+    @Namespace private var scrollingTextID
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
@@ -67,21 +69,28 @@ struct WorkflowStepView: View {
                     }
 
                     ScrollView {
-                        Text((abbreviated ? "...\n\n" : "") + log)
-                            .font(.caption.monospaced())
-                            .lineSpacing(4)
-                            .padding(8)
-                            .background(
-                                GeometryReader { proxy in
-                                    Color.clear
-                                        .onAppear {
-                                            let height = proxy.size.height
-                                            if height < logHeight {
-                                                logHeight = height
+                        ScrollViewReader { scrollProxy in
+                            Text((abbreviated ? "...\n\n" : "") + log)
+                                .id(scrollingTextID)
+                                .font(.caption.monospaced())
+                                .lineSpacing(4)
+                                .padding(8)
+                                .background(
+                                    GeometryReader { proxy in
+                                        Color.clear
+                                            .onAppear {
+                                                // modify height
+                                                let height = proxy.size.height
+                                                if height < logHeight {
+                                                    logHeight = height
+                                                }
+
+                                                // scroll to bottom
+                                                scrollProxy.scrollTo(scrollingTextID, anchor: .bottomTrailing)
                                             }
-                                        }
-                                }
-                            )
+                                    }
+                                )
+                        }
                     }
                 }
                 .frame(height: logHeight)
