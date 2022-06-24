@@ -1,3 +1,4 @@
+import GitHub
 import GitHubAPI
 import UIKit
 
@@ -10,7 +11,7 @@ extension WorkflowRunDetailRouting {
     func pushWorkflowRunDetail(from originVC: UIViewController, workflowRun: GitHubWorkflowRun) {
         let viewModel = WorkflowRunDetailViewModel(
             workflowRun: workflowRun,
-            gitHubAPIClient: GitHubAPIClient.shared
+            gitHubUseCase: GitHubUseCase.shared
         )
         let destinationVC = WorkflowRunDetailViewController(
             viewModel: viewModel

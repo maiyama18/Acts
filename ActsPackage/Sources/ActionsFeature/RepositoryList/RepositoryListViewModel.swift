@@ -1,6 +1,7 @@
 import AsyncAlgorithms
 import Combine
 import Core
+import GitHub
 import GitHubAPI
 
 @MainActor
@@ -17,11 +18,11 @@ public final class RepositoryListViewModel: ObservableObject {
 
     let events: AsyncChannel<Event> = .init()
 
-    private let gitHubAPIClient: GitHubAPIClientProtocol
+    private let gitHubUseCase: GitHubUseCaseProtocol
     private let secureStorage: SecureStorageProtocol
 
-    public init(gitHubAPIClient: GitHubAPIClientProtocol, secureStorage: SecureStorageProtocol) {
-        self.gitHubAPIClient = gitHubAPIClient
+    public init(gitHubUseCase: GitHubUseCaseProtocol, secureStorage: SecureStorageProtocol) {
+        self.gitHubUseCase = gitHubUseCase
         self.secureStorage = secureStorage
     }
 
@@ -31,7 +32,7 @@ public final class RepositoryListViewModel: ObservableObject {
             showingHUD = false
         }
         do {
-            repositories = try await gitHubAPIClient.getRepositories()
+            repositories = try await gitHubUseCase.getRepositories()
         } catch {
             switch error {
             case GitHubAPIError.unauthorized:

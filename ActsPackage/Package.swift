@@ -32,7 +32,7 @@ let package = Package(
             name: "ActionsFeature",
             dependencies: [
                 "SettingsFeature",
-                "GitHubAPI",
+                "GitHub",
                 "Core",
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
             ]
@@ -43,6 +43,12 @@ let package = Package(
                 "AuthAPI",
                 "Core",
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
+            ]
+        ),
+        .target(
+            name: "GitHub",
+            dependencies: [
+                "GitHubAPI",
             ]
         ),
         .target(name: "AuthAPI"),

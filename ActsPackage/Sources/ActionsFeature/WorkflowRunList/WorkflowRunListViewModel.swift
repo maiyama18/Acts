@@ -1,6 +1,7 @@
 import AsyncAlgorithms
 import Combine
 import Core
+import GitHub
 import GitHubAPI
 
 @MainActor
@@ -17,7 +18,7 @@ public final class WorkflowRunListViewModel: ObservableObject {
     let events: AsyncChannel<Event> = .init()
 
     private let repository: GitHubRepository
-    private let gitHubAPIClient: GitHubAPIClientProtocol
+    private let gitHubUseCase: GitHubUseCaseProtocol
 
     var title: String {
         repository.fullName
@@ -25,15 +26,15 @@ public final class WorkflowRunListViewModel: ObservableObject {
 
     init(
         repository: GitHubRepository,
-        gitHubAPIClient: GitHubAPIClientProtocol
+        gitHubUseCase: GitHubUseCaseProtocol
     ) {
         self.repository = repository
-        self.gitHubAPIClient = gitHubAPIClient
+        self.gitHubUseCase = gitHubUseCase
     }
 
     func onViewLoaded() async {
         do {
-            let response = try await gitHubAPIClient.getWorkflowRuns(repository: repository)
+            let response = try await gitHubUseCase.getWorkflowRuns(repository: repository)
 
             workflowRunCount = response.totalCount
             workflowRuns = response.workflowRuns
