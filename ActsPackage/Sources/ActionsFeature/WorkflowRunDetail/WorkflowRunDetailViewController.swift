@@ -57,6 +57,8 @@ final class WorkflowRunDetailViewController: UIViewController {
                     )
                 case let .openOnBrowser(url):
                     await UIApplication.shared.open(url)
+                case .refreshNavigationBar:
+                    setupNavigation()
                 case .unauthorized:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case let .showError(message):

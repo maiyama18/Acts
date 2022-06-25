@@ -41,6 +41,9 @@ struct WorkflowRunDetailScreen: View {
                 }
             }
         }
+        .refreshable {
+            await viewModel.onPullToRefreshed()
+        }
         .listStyle(.plain)
     }
 }

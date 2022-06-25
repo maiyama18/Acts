@@ -4,6 +4,7 @@ import GitHubAPI
 public protocol GitHubUseCaseProtocol {
     func getRepositories() async throws -> [GitHubRepository]
     func getWorkflowRuns(repository: GitHubRepository) async throws -> [GitHubWorkflowRun]
+    func getWorkflowRun(repository: GitHubRepository, runId: Int) async throws -> GitHubWorkflowRun
     func getWorkflowJobs(run: GitHubWorkflowRun) async throws -> [GitHubWorkflowJob]
     func getWorkflowStepLog(step: GitHubWorkflowStep, siblingSteps: [GitHubWorkflowStep], maxLines: Int) async throws -> GitHubWorkflowStepLog?
     func rerunWorkflow(run: GitHubWorkflowRun) async throws
@@ -32,6 +33,11 @@ public final class GitHubUseCase: GitHubUseCaseProtocol {
     public func getWorkflowRuns(repository: GitHubRepository) async throws -> [GitHubWorkflowRun] {
         let response = try await apiClient.getWorkflowRuns(repositoryFullName: repository.fullName)
         return response.workflowRuns.map { GitHubWorkflowRun(response: $0) }
+    }
+
+    public func getWorkflowRun(repository: GitHubRepository, runId: Int) async throws -> GitHubWorkflowRun {
+        let response = try await apiClient.getWorkflowRun(repositoryFullName: repository.fullName, runId: runId)
+        return GitHubWorkflowRun(response: response)
     }
 
     public func getWorkflowJobs(run: GitHubWorkflowRun) async throws -> [GitHubWorkflowJob] {

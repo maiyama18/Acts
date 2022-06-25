@@ -10,6 +10,7 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     enum Event {
         case requestSent(action: String)
         case openOnBrowser(url: URL)
+        case refreshNavigationBar
         case unauthorized
         case showError(message: String)
     }
@@ -18,7 +19,7 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
 
     let events: AsyncChannel<Event> = .init()
 
-    private let workflowRun: GitHubWorkflowRun
+    private var workflowRun: GitHubWorkflowRun
     private let gitHubUseCase: GitHubUseCaseProtocol
 
     var title: String {
@@ -46,14 +47,18 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
         do {
             workflowJobs = try await gitHubUseCase.getWorkflowJobs(run: workflowRun)
         } catch {
-            switch error {
-            case GitHubAPIError.unauthorized:
-                await events.send(.unauthorized)
-            case GitHubAPIError.disconnected:
-                await events.send(.showError(message: L10n.ErrorMessage.disconnected))
-            default:
-                await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
-            }
+            await handleGitHubError(error: error)
+        }
+    }
+
+    func onPullToRefreshed() async {
+        do {
+            workflowJobs = try await gitHubUseCase.getWorkflowJobs(run: workflowRun)
+
+            workflowRun = try await gitHubUseCase.getWorkflowRun(repository: workflowRun.repository, runId: workflowRun.id)
+            await events.send(.refreshNavigationBar)
+        } catch {
+            await handleGitHubError(error: error)
         }
     }
 
@@ -107,6 +112,17 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     func onSeeEntireLogTapped(job: GitHubWorkflowJob) async {
         guard let url = URL(string: job.htmlUrl) else { return }
         await events.send(.openOnBrowser(url: url))
+    }
+
+    private func handleGitHubError(error: Error) async {
+        switch error {
+        case GitHubAPIError.unauthorized:
+            await events.send(.unauthorized)
+        case GitHubAPIError.disconnected:
+            await events.send(.showError(message: L10n.ErrorMessage.disconnected))
+        default:
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+        }
     }
 
     private func findChildSteps(jobId: Int) -> [GitHubWorkflowStep] {
