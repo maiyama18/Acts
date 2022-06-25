@@ -11,6 +11,7 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
         case requestSent(action: String)
         case openOnBrowser(url: URL)
         case refreshNavigationBar
+        case showLogUnavailable
         case unauthorized
         case showError(message: String)
     }
@@ -63,6 +64,11 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     }
 
     func onStepTapped(step: GitHubWorkflowStep) async {
+        guard workflowRun.canDownloadLog else {
+            await events.send(.showLogUnavailable)
+            return
+        }
+
         guard let indices = findWorkflowJobsIndices(jobId: step.jobId, step: step) else {
             return
         }

@@ -23,4 +23,13 @@ public struct GitHubWorkflowRun: Identifiable {
         cancelUrl = response.cancelUrl
         repository = GitHubRepository(response: response.repository)
     }
+
+    public var canDownloadLog: Bool {
+        switch status {
+        case .queued, .inProgress:
+            return false
+        default:
+            return true
+        }
+    }
 }
