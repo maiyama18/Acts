@@ -1,5 +1,4 @@
 import Core
-import GitHubAPI
 import UIKit
 
 @MainActor

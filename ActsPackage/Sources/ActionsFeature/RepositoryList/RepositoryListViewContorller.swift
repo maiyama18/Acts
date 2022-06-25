@@ -1,5 +1,4 @@
 import Core
-import GitHubAPI
 import SettingsFeature
 import UIKit
 

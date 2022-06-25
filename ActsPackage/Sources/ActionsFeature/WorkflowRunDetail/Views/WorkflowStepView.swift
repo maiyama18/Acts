@@ -1,4 +1,4 @@
-import GitHubAPI
+import GitHub
 import SwiftUI
 
 struct WorkflowStepView: View {
@@ -28,7 +28,7 @@ struct WorkflowStepView: View {
                 }
                 .frame(width: 16, alignment: .leading)
 
-                step.stepStatus.iconImage()
+                step.status.iconImage()
 
                 Text(step.name)
                     .font(.callout)
