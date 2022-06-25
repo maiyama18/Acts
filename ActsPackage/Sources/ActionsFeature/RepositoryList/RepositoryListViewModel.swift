@@ -8,12 +8,12 @@ import GitHubAPI
 public final class RepositoryListViewModel: ObservableObject {
     enum Event {
         case showSettings
-        case showRepository(repository: GitHubRepository)
+        case showRepository(repository: GitHubRepositoryResponse)
         case unauthorized
         case showError(message: String)
     }
 
-    @Published private(set) var repositories: [GitHubRepository] = []
+    @Published private(set) var repositories: [GitHubRepositoryResponse] = []
     @Published private(set) var showingHUD: Bool = false
 
     let events: AsyncChannel<Event> = .init()
@@ -47,7 +47,7 @@ public final class RepositoryListViewModel: ObservableObject {
         cacheClient.deletePreviousDaysGitHubWorkflowStepLogObjects()
     }
 
-    func onRepositoryTapped(repository: GitHubRepository) async {
+    func onRepositoryTapped(repository: GitHubRepositoryResponse) async {
         await events.send(.showRepository(repository: repository))
     }
 

@@ -2,7 +2,7 @@ import GitHubAPI
 import SwiftUI
 
 struct WorkflowStepView: View {
-    var step: GitHubWorkflowStep
+    var step: GitHubWorkflowStepResponse
     var onTap: () async -> Void
     var onSeeEntireLogTapped: () async -> Void
 

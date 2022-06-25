@@ -3,12 +3,12 @@ import Foundation
 import ZIPFoundation
 
 public protocol GitHubAPIClientProtocol {
-    func getRepositories() async throws -> [GitHubRepository]
-    func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns
-    func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs
-    func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog]
-    func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws
-    func cancelWorkflow(workflowRun: GitHubWorkflowRun) async throws
+    func getRepositories() async throws -> [GitHubRepositoryResponse]
+    func getWorkflowRuns(repository: GitHubRepositoryResponse) async throws -> GitHubWorkflowRunsResponse
+    func getWorkflowJobs(workflowRun: GitHubWorkflowRunResponse) async throws -> GitHubWorkflowJobsResponse
+    func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLogResponse]
+    func rerunWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws
+    func cancelWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws
 }
 
 public final class GitHubAPIClient: GitHubAPIClientProtocol {
@@ -43,19 +43,19 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         self.secureStorage = secureStorage
     }
 
-    public func getRepositories() async throws -> [GitHubRepository] {
+    public func getRepositories() async throws -> [GitHubRepositoryResponse] {
         try await request(urlString: "https://api.github.com/user/repos?sort=updated_at", method: "GET")
     }
 
-    public func getWorkflowRuns(repository: GitHubRepository) async throws -> GitHubWorkflowRuns {
+    public func getWorkflowRuns(repository: GitHubRepositoryResponse) async throws -> GitHubWorkflowRunsResponse {
         try await request(urlString: "https://api.github.com/repos/\(repository.owner.login)/\(repository.name)/actions/runs", method: "GET")
     }
 
-    public func getWorkflowJobs(workflowRun: GitHubWorkflowRun) async throws -> GitHubWorkflowJobs {
+    public func getWorkflowJobs(workflowRun: GitHubWorkflowRunResponse) async throws -> GitHubWorkflowJobsResponse {
         try await request(urlString: workflowRun.jobsUrl, method: "GET")
     }
 
-    public func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLog] {
+    public func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLogResponse] {
         let zipFileURL = try await download(urlString: logsUrl)
         let destinationDirectoryURL = URL(
             fileURLWithPath: NSTemporaryDirectory().appending("logs-\(Date().timeIntervalSince1970)"),
@@ -69,7 +69,7 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         )
         try fileManager.unzipItem(at: zipFileURL, to: destinationDirectoryURL)
 
-        var jobLogs: [String: GitHubWorkflowJobLog] = [:]
+        var jobLogs: [String: GitHubWorkflowJobLogResponse] = [:]
         for jobDirectory in try fileManager.subDirectoriesOfDirectory(at: destinationDirectoryURL) {
             let jobName = jobDirectory.lastPathComponent
             let stepLogFiles = try fileManager.contentsOfDirectory(
@@ -77,7 +77,7 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
                 includingPropertiesForKeys: nil
             )
 
-            var stepLogs: [GitHubWorkflowStepLog] = []
+            var stepLogs: [GitHubWorkflowStepLogResponse] = []
             for stepLogFile in stepLogFiles {
                 guard let stepNumberString = stepLogFile.lastPathComponent.split(separator: "_").first,
                       let stepNumber = Int(stepNumberString)
@@ -117,16 +117,16 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
                     throw GitHubAPIError.unexpectedError
                 }
             }
-            jobLogs[jobName] = GitHubWorkflowJobLog(stepLogs: stepLogs)
+            jobLogs[jobName] = GitHubWorkflowJobLogResponse(stepLogs: stepLogs)
         }
         return jobLogs
     }
 
-    public func rerunWorkflow(workflowRun: GitHubWorkflowRun) async throws {
+    public func rerunWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws {
         try await complete(urlString: workflowRun.rerunUrl, method: "POST")
     }
 
-    public func cancelWorkflow(workflowRun: GitHubWorkflowRun) async throws {
+    public func cancelWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws {
         try await complete(urlString: workflowRun.cancelUrl, method: "POST")
     }
 

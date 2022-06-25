@@ -7,17 +7,17 @@ import GitHubAPI
 @MainActor
 public final class WorkflowRunListViewModel: ObservableObject {
     enum Event {
-        case showWorkflowRun(workflowRun: GitHubWorkflowRun)
+        case showWorkflowRun(workflowRun: GitHubWorkflowRunResponse)
         case unauthorized
         case showError(message: String)
     }
 
     @Published private(set) var workflowRunCount: Int = 0
-    @Published private(set) var workflowRuns: [GitHubWorkflowRun] = []
+    @Published private(set) var workflowRuns: [GitHubWorkflowRunResponse] = []
 
     let events: AsyncChannel<Event> = .init()
 
-    private let repository: GitHubRepository
+    private let repository: GitHubRepositoryResponse
     private let gitHubUseCase: GitHubUseCaseProtocol
 
     var title: String {
@@ -25,7 +25,7 @@ public final class WorkflowRunListViewModel: ObservableObject {
     }
 
     init(
-        repository: GitHubRepository,
+        repository: GitHubRepositoryResponse,
         gitHubUseCase: GitHubUseCaseProtocol
     ) {
         self.repository = repository
@@ -50,7 +50,7 @@ public final class WorkflowRunListViewModel: ObservableObject {
         }
     }
 
-    func onWorkflowRunTapped(workflowRun: GitHubWorkflowRun) async {
+    func onWorkflowRunTapped(workflowRun: GitHubWorkflowRunResponse) async {
         await events.send(.showWorkflowRun(workflowRun: workflowRun))
     }
 }

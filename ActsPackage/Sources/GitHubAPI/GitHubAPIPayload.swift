@@ -80,26 +80,26 @@ public enum Status {
     }
 }
 
-public struct GitHubRepository: Codable, Identifiable {
+public struct GitHubRepositoryResponse: Codable, Identifiable {
     public var id: Int
     public var name: String
-    public var owner: GitHubUser
+    public var owner: GitHubUserResponse
 
     public var fullName: String {
         owner.login + "/" + name
     }
 }
 
-public struct GitHubWorkflowRuns: Codable {
+public struct GitHubWorkflowRunsResponse: Codable {
     public var totalCount: Int
-    public var workflowRuns: [GitHubWorkflowRun]
+    public var workflowRuns: [GitHubWorkflowRunResponse]
 }
 
-public struct GitHubWorkflowRun: Codable, Identifiable {
+public struct GitHubWorkflowRunResponse: Codable, Identifiable {
     public var id: Int
     public var name: String
     public var runNumber: Int
-    public var actor: GitHubUser
+    public var actor: GitHubUserResponse
     public var createdAt: Date
     public var jobsUrl: String
     public var logsUrl: String
@@ -114,17 +114,17 @@ public struct GitHubWorkflowRun: Codable, Identifiable {
     }
 }
 
-public struct GitHubWorkflowJobs: Codable {
+public struct GitHubWorkflowJobsResponse: Codable {
     public var totalCount: Int
-    public var jobs: [GitHubWorkflowJob]
+    public var jobs: [GitHubWorkflowJobResponse]
 }
 
-public struct GitHubWorkflowJob: Codable, Identifiable {
+public struct GitHubWorkflowJobResponse: Codable, Identifiable {
     public var id: Int
     public var runId: Int
     public var name: String
     public var htmlUrl: String
-    public var steps: [GitHubWorkflowStep]
+    public var steps: [GitHubWorkflowStepResponse]
     public var startedAt: Date?
     public var completedAt: Date?
 
@@ -192,7 +192,7 @@ public struct GitHubWorkflowJob: Codable, Identifiable {
     }
 }
 
-public struct GitHubWorkflowStep: Codable, Identifiable {
+public struct GitHubWorkflowStepResponse: Codable, Identifiable {
     public static func generateRunId(jobRunId: Int, stepNumber: Int) -> String {
         "\(jobRunId)-\(stepNumber)"
     }
@@ -210,7 +210,7 @@ public struct GitHubWorkflowStep: Codable, Identifiable {
     // changed by user interaction
     public var log: LogState = .notLoaded
     // filled by github usecase
-    public var job: GitHubWorkflowJob!
+    public var job: GitHubWorkflowJobResponse!
 
     private var status: String
     private var conclusion: String?
@@ -250,16 +250,16 @@ public struct GitHubWorkflowStep: Codable, Identifiable {
     }
 }
 
-public struct GitHubUser: Codable {
+public struct GitHubUserResponse: Codable {
     public var login: String
     public var avatarUrl: String
 }
 
-public struct GitHubWorkflowJobLog {
-    public var stepLogs: [GitHubWorkflowStepLog]
+public struct GitHubWorkflowJobLogResponse {
+    public var stepLogs: [GitHubWorkflowStepLogResponse]
 }
 
-public struct GitHubWorkflowStepLog {
+public struct GitHubWorkflowStepLogResponse {
     public var stepNumber: Int
     public var log: String
     public var abbreviated: Bool
@@ -271,7 +271,7 @@ public struct GitHubWorkflowStepLog {
     }
 }
 
-public extension GitHubWorkflowStepLog {
+public extension GitHubWorkflowStepLogResponse {
     func toCacheObject(id: String) -> GitHubWorkflowStepLogObject {
         GitHubWorkflowStepLogObject(id: id, stepNumber: stepNumber, log: log, abbreviated: abbreviated)
     }

@@ -14,11 +14,11 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
         case showError(message: String)
     }
 
-    @Published private(set) var workflowJobs: [GitHubWorkflowJob] = []
+    @Published private(set) var workflowJobs: [GitHubWorkflowJobResponse] = []
 
     let events: AsyncChannel<Event> = .init()
 
-    private let workflowRun: GitHubWorkflowRun
+    private let workflowRun: GitHubWorkflowRunResponse
     private let gitHubUseCase: GitHubUseCaseProtocol
 
     var title: String {
@@ -35,7 +35,7 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     }
 
     public init(
-        workflowRun: GitHubWorkflowRun,
+        workflowRun: GitHubWorkflowRunResponse,
         gitHubUseCase: GitHubUseCaseProtocol
     ) {
         self.workflowRun = workflowRun
@@ -58,7 +58,7 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
         }
     }
 
-    func onStepTapped(job: GitHubWorkflowJob, step: GitHubWorkflowStep) async {
+    func onStepTapped(job: GitHubWorkflowJobResponse, step: GitHubWorkflowStepResponse) async {
         guard let indices = findWorkflowJobsIndices(job: job, step: step) else {
             return
         }
@@ -105,12 +105,12 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
         }
     }
 
-    func onSeeEntireLogTapped(job: GitHubWorkflowJob) async {
+    func onSeeEntireLogTapped(job: GitHubWorkflowJobResponse) async {
         guard let url = URL(string: job.htmlUrl) else { return }
         await events.send(.openOnBrowser(url: url))
     }
 
-    private func findWorkflowJobsIndices(job: GitHubWorkflowJob, step: GitHubWorkflowStep) -> (jobIndex: Int, stepIndex: Int)? {
+    private func findWorkflowJobsIndices(job: GitHubWorkflowJobResponse, step: GitHubWorkflowStepResponse) -> (jobIndex: Int, stepIndex: Int)? {
         for jobIndex in workflowJobs.indices {
             guard workflowJobs[jobIndex].id == job.id else { continue }
             for stepIndex in workflowJobs[jobIndex].steps.indices {
