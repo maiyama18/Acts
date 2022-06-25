@@ -24,6 +24,10 @@ public enum L10n {
       /// Repositories
       public static let repositoryList = L10n.tr("Localizable", "actions_feature.title.repository_list")
     }
+    public enum WorkflowRunList {
+      /// No workflow runs
+      public static let emptyMessage = L10n.tr("Localizable", "actions_feature.workflow_run_list.empty_message")
+    }
   }
 
   public enum Common {
