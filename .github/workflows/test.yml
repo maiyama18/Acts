@@ -18,7 +18,6 @@ jobs:
       - uses: irgaly/setup-mint@v1
         with:
           cache-prefix: "mint"
-          bootstrap: false
 
       - name: create mocks
         run: make mock
