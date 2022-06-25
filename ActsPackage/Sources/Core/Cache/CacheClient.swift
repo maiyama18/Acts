@@ -72,9 +72,7 @@ public class CacheClient: CacheClientProtocol {
     }
 
     private func getInstance() -> Realm? {
-        try? Realm(
-            configuration: Realm.Configuration(deleteRealmIfMigrationNeeded: true)
-        )
+        try? shouldGetInstance()
     }
 
     private func shouldGetInstance() throws -> Realm {
