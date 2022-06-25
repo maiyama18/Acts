@@ -1,15 +1,10 @@
 import Core
 import Foundation
-import SwiftUI
 
 public struct GitHubRepositoryResponse: Codable, Identifiable {
     public var id: Int
     public var name: String
     public var owner: GitHubUserResponse
-
-    public var fullName: String {
-        owner.login + "/" + name
-    }
 }
 
 public struct GitHubWorkflowRunsResponse: Codable {
@@ -25,11 +20,18 @@ public struct GitHubWorkflowRunResponse: Codable, Identifiable {
     public var conclusion: String?
     public var actor: GitHubUserResponse
     public var createdAt: Date
+    public var updatedAt: Date
     public var jobsUrl: String
     public var logsUrl: String
     public var rerunUrl: String
     public var cancelUrl: String
+    public var headBranch: String
+    public var headCommit: GitHubWorkflowCommitResponse
     public var repository: GitHubRepositoryResponse
+}
+
+public struct GitHubWorkflowCommitResponse: Codable {
+    public var message: String
 }
 
 public struct GitHubWorkflowJobsResponse: Codable {
