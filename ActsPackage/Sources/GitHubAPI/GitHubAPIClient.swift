@@ -5,6 +5,7 @@ import ZIPFoundation
 public protocol GitHubAPIClientProtocol {
     func getRepositories() async throws -> [GitHubRepositoryResponse]
     func getWorkflowRuns(repositoryFullName: String) async throws -> GitHubWorkflowRunsResponse
+    func getWorkflowRun(repositoryFullName: String, runId: Int) async throws -> GitHubWorkflowRunResponse
     func getWorkflowJobs(url: String) async throws -> GitHubWorkflowJobsResponse
     func getWorkflowJobLog(logsUrl: String, jobName: String) async throws -> [Int: String]
     func rerunWorkflow(url: String) async throws
@@ -51,6 +52,10 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         try await request(urlString: "https://api.github.com/repos/\(repositoryFullName)/actions/runs", method: "GET")
     }
 
+    public func getWorkflowRun(repositoryFullName: String, runId: Int) async throws -> GitHubWorkflowRunResponse {
+        try await request(urlString: "https://api.github.com/repos/\(repositoryFullName)/actions/runs/\(runId)", method: "GET")
+    }
+
     public func getWorkflowJobs(url: String) async throws -> GitHubWorkflowJobsResponse {
         try await request(urlString: url, method: "GET")
     }
@@ -68,6 +73,9 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
             withIntermediateDirectories: true
         )
         try fileManager.unzipItem(at: zipFileURL, to: destinationDirectoryURL)
+        defer {
+            try? fileManager.removeItem(at: destinationDirectoryURL)
+        }
 
         let jobLogsURL = destinationDirectoryURL.appendingPathComponent(jobName)
         var stepLogs: [Int: String] = [:]

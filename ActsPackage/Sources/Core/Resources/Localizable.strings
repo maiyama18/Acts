@@ -13,5 +13,6 @@
 "actions_feature.title.repository_list" = "Repositories";
 
 "actions_feature.message.workflow_request_sent" = "%@ request successfully sent";
+"actions_feature.message.in_progress_log_unavailable" = "Log is unavailable while the workflow is in progress";
 
 "settings_feature.sign_out_from_github" = "Sign Out";

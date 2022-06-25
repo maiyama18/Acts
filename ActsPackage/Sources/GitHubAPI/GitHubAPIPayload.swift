@@ -29,6 +29,7 @@ public struct GitHubWorkflowRunResponse: Codable, Identifiable {
     public var logsUrl: String
     public var rerunUrl: String
     public var cancelUrl: String
+    public var repository: GitHubRepositoryResponse
 }
 
 public struct GitHubWorkflowJobsResponse: Codable {

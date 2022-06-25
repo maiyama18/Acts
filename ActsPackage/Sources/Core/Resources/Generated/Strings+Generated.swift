@@ -13,6 +13,8 @@ public enum L10n {
 
   public enum ActionsFeature {
     public enum Message {
+      /// Log is unavailable while the workflow is in progress
+      public static let inProgressLogUnavailable = L10n.tr("Localizable", "actions_feature.message.in_progress_log_unavailable")
       /// %@ request successfully sent
       public static func workflowRequestSent(_ p1: Any) -> String {
         return L10n.tr("Localizable", "actions_feature.message.workflow_request_sent", String(describing: p1))

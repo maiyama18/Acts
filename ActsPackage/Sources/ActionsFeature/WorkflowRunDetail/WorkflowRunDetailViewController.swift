@@ -57,6 +57,10 @@ final class WorkflowRunDetailViewController: UIViewController {
                     )
                 case let .openOnBrowser(url):
                     await UIApplication.shared.open(url)
+                case .refreshNavigationBar:
+                    setupNavigation()
+                case .showLogUnavailable:
+                    Dialogs.showSimpleMessage(from: self, message: L10n.ActionsFeature.Message.inProgressLogUnavailable)
                 case .unauthorized:
                     NotificationCenter.default.post(name: .didChangeAuthState, object: nil)
                 case let .showError(message):

@@ -10,6 +10,7 @@ public struct GitHubWorkflowRun: Identifiable {
     public var logsUrl: String
     public var rerunUrl: String
     public var cancelUrl: String
+    public var repository: GitHubRepository
 
     init(response: GitHubWorkflowRunResponse) {
         id = response.id
@@ -20,5 +21,15 @@ public struct GitHubWorkflowRun: Identifiable {
         logsUrl = response.logsUrl
         rerunUrl = response.rerunUrl
         cancelUrl = response.cancelUrl
+        repository = GitHubRepository(response: response.repository)
+    }
+
+    public var canDownloadLog: Bool {
+        switch status {
+        case .queued, .inProgress:
+            return false
+        default:
+            return true
+        }
     }
 }
