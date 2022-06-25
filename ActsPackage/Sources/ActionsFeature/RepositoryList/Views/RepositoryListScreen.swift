@@ -1,3 +1,4 @@
+import GitHub
 import PKHUD
 import SwiftUI
 
@@ -5,10 +6,10 @@ struct RepositoryListScreen: View {
     @ObservedObject var viewModel: RepositoryListViewModel
 
     var body: some View {
-        VStack {
-            List {
+        List {
+            Section {
                 ForEach(viewModel.repositories) { repository in
-                    Text(repository.name)
+                    RepositoryView(repository: repository)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -17,8 +18,11 @@ struct RepositoryListScreen: View {
                             }
                         }
                 }
+            } header: {
+                Text("Your's")
             }
         }
+        .listStyle(.plain)
         .progressHUD(showing: viewModel.showingHUD)
     }
 }
