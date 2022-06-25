@@ -17,6 +17,10 @@ struct WorkflowRunListView: View {
                     }
             }
         }
+        .refreshable {
+            await viewModel.onPullToRefreshed()
+        }
         .listStyle(.plain)
+        .progressHUD(showing: viewModel.showingHUD)
     }
 }
