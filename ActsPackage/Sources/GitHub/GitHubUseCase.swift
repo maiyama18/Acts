@@ -1,8 +1,9 @@
 import Core
+import Foundation
 import GitHubAPI
 
 public protocol GitHubUseCaseProtocol {
-    func getRepositories() async throws -> [GitHubRepository]
+    func getRepositories() async throws -> GitHubRepositories
     func getWorkflowRuns(repository: GitHubRepository) async throws -> [GitHubWorkflowRun]
     func getWorkflowRun(repository: GitHubRepository, runId: Int) async throws -> GitHubWorkflowRun
     func getWorkflowJobs(run: GitHubWorkflowRun) async throws -> [GitHubWorkflowJob]
@@ -11,7 +12,7 @@ public protocol GitHubUseCaseProtocol {
     func cancelWorkflow(run: GitHubWorkflowRun) async throws
 }
 
-public final class GitHubUseCase: GitHubUseCaseProtocol {
+public actor GitHubUseCase: GitHubUseCaseProtocol {
     public static let shared: GitHubUseCase = .init(
         apiClient: GitHubAPIClient.shared,
         cacheClient: CacheClient.shared
@@ -25,9 +26,17 @@ public final class GitHubUseCase: GitHubUseCaseProtocol {
         self.cacheClient = cacheClient
     }
 
-    public func getRepositories() async throws -> [GitHubRepository] {
-        let response = try await apiClient.getRepositories()
-        return response.map { GitHubRepository(response: $0) }
+    public func getRepositories() async throws -> GitHubRepositories {
+        let favoriteRepositoryObjects = try cacheClient.getFavoriteGitHubRepositories()
+        let favoriteRepositories = favoriteRepositoryObjects.map { GitHubRepository(object: $0) }
+        let favoriteRepositoryIds = Set(favoriteRepositories.map(\.id))
+
+        let usersRepositoryResponses = try await apiClient.getUsersRepositories().filter { !favoriteRepositoryIds.contains($0.id) }
+
+        return GitHubRepositories(
+            usersRepositories: usersRepositoryResponses.map { GitHubRepository(response: $0) },
+            favoriteRepositories: favoriteRepositories
+        )
     }
 
     public func getWorkflowRuns(repository: GitHubRepository) async throws -> [GitHubWorkflowRun] {

@@ -15,4 +15,6 @@
 "actions_feature.message.workflow_request_sent" = "%@ request successfully sent";
 "actions_feature.message.in_progress_log_unavailable" = "Log is unavailable while the workflow is in progress";
 
+"actions_feature.workflow_run_list.empty_message" = "No workflow runs";
+
 "settings_feature.sign_out_from_github" = "Sign Out";

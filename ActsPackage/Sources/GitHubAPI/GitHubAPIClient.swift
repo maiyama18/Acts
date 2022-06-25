@@ -3,7 +3,7 @@ import Foundation
 import ZIPFoundation
 
 public protocol GitHubAPIClientProtocol {
-    func getRepositories() async throws -> [GitHubRepositoryResponse]
+    func getUsersRepositories() async throws -> [GitHubRepositoryResponse]
     func getWorkflowRuns(repositoryFullName: String) async throws -> GitHubWorkflowRunsResponse
     func getWorkflowRun(repositoryFullName: String, runId: Int) async throws -> GitHubWorkflowRunResponse
     func getWorkflowJobs(url: String) async throws -> GitHubWorkflowJobsResponse
@@ -44,7 +44,7 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         self.secureStorage = secureStorage
     }
 
-    public func getRepositories() async throws -> [GitHubRepositoryResponse] {
+    public func getUsersRepositories() async throws -> [GitHubRepositoryResponse] {
         try await request(urlString: "https://api.github.com/user/repos?sort=updated_at", method: "GET")
     }
 

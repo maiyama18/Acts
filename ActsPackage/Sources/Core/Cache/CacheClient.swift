@@ -2,9 +2,15 @@ import Foundation
 import RealmSwift
 
 public protocol CacheClientProtocol {
+    // log cache
     func getGitHubWorkflowStepLogObject(stepId: String) -> GitHubWorkflowStepLogObject?
     func saveGitHubWorkflowStepLogObject(object: GitHubWorkflowStepLogObject)
     func deletePreviousDaysGitHubWorkflowStepLogObjects()
+
+    // favorite repository
+    func getFavoriteGitHubRepositories() throws -> [FavoriteGitHubRepositoryObject]
+    func saveFavoriteGitHubRepository(object: FavoriteGitHubRepositoryObject) throws
+    func deleteFavoriteGitHubRepository(id: Int) throws
 }
 
 public class CacheClient: CacheClientProtocol {
@@ -18,6 +24,10 @@ public class CacheClient: CacheClientProtocol {
 
     public func saveGitHubWorkflowStepLogObject(object: GitHubWorkflowStepLogObject) {
         guard let realm = getInstance() else { return }
+        guard realm.object(ofType: GitHubWorkflowStepLogObject.self, forPrimaryKey: object.stepId) == nil else {
+            return
+        }
+
         do {
             try realm.write {
                 realm.add(object)
@@ -41,8 +51,32 @@ public class CacheClient: CacheClientProtocol {
         }
     }
 
+    public func getFavoriteGitHubRepositories() throws -> [FavoriteGitHubRepositoryObject] {
+        let realm = try shouldGetInstance()
+        return realm.objects(FavoriteGitHubRepositoryObject.self).map { $0 }
+    }
+
+    public func saveFavoriteGitHubRepository(object: FavoriteGitHubRepositoryObject) throws {
+        let realm = try shouldGetInstance()
+        try realm.write {
+            realm.add(object)
+        }
+    }
+
+    public func deleteFavoriteGitHubRepository(id: Int) throws {
+        guard let realm = getInstance() else { return }
+        guard let targetRepository = realm.object(ofType: FavoriteGitHubRepositoryObject.self, forPrimaryKey: id) else { return }
+        try? realm.write {
+            realm.delete(targetRepository)
+        }
+    }
+
     private func getInstance() -> Realm? {
-        try? Realm(
+        try? shouldGetInstance()
+    }
+
+    private func shouldGetInstance() throws -> Realm {
+        try Realm(
             configuration: Realm.Configuration(deleteRealmIfMigrationNeeded: true)
         )
     }

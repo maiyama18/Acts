@@ -13,6 +13,7 @@ public final class WorkflowRunListViewModel: ObservableObject {
     }
 
     @Published private(set) var workflowRuns: [GitHubWorkflowRun] = []
+    @Published private(set) var showingHUD: Bool = false
 
     let events: AsyncChannel<Event> = .init()
 
@@ -32,21 +33,38 @@ public final class WorkflowRunListViewModel: ObservableObject {
     }
 
     func onViewLoaded() async {
+        showingHUD = true
+        defer {
+            showingHUD = false
+        }
+
         do {
             workflowRuns = try await gitHubUseCase.getWorkflowRuns(repository: repository)
         } catch {
-            switch error {
-            case GitHubAPIError.unauthorized:
-                await events.send(.unauthorized)
-            case GitHubAPIError.disconnected:
-                await events.send(.showError(message: L10n.ErrorMessage.disconnected))
-            default:
-                await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
-            }
+            await handleGitHubError(error: error)
+        }
+    }
+
+    func onPullToRefreshed() async {
+        do {
+            workflowRuns = try await gitHubUseCase.getWorkflowRuns(repository: repository)
+        } catch {
+            await handleGitHubError(error: error)
         }
     }
 
     func onWorkflowRunTapped(run: GitHubWorkflowRun) async {
         await events.send(.showWorkflowRun(run: run))
+    }
+
+    private func handleGitHubError(error: Error) async {
+        switch error {
+        case GitHubAPIError.unauthorized:
+            await events.send(.unauthorized)
+        case GitHubAPIError.disconnected:
+            await events.send(.showError(message: L10n.ErrorMessage.disconnected))
+        default:
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+        }
     }
 }
