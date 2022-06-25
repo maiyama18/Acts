@@ -38,17 +38,20 @@ public final class RepositoryListViewModel: ObservableObject {
             favoriteRepositories = repositories.favoriteRepositories
             usersRepositories = repositories.usersRepositories
         } catch {
-            switch error {
-            case GitHubAPIError.unauthorized:
-                await events.send(.unauthorized)
-            case GitHubAPIError.disconnected:
-                await events.send(.showError(message: L10n.ErrorMessage.disconnected))
-            default:
-                await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
-            }
+            await handleGitHubError(error: error)
         }
 
         cacheClient.deletePreviousDaysGitHubWorkflowStepLogObjects()
+    }
+
+    func onPullToRefreshed() async {
+        do {
+            let repositories = try await gitHubUseCase.getRepositories()
+            favoriteRepositories = repositories.favoriteRepositories
+            usersRepositories = repositories.usersRepositories
+        } catch {
+            await handleGitHubError(error: error)
+        }
     }
 
     func onRepositoryTapped(repository: GitHubRepository) async {
@@ -78,6 +81,17 @@ public final class RepositoryListViewModel: ObservableObject {
                 favoriteRepositories.removeAll(where: { $0.id == repository.id })
             }
         } catch {
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+        }
+    }
+
+    private func handleGitHubError(error: Error) async {
+        switch error {
+        case GitHubAPIError.unauthorized:
+            await events.send(.unauthorized)
+        case GitHubAPIError.disconnected:
+            await events.send(.showError(message: L10n.ErrorMessage.disconnected))
+        default:
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
         }
     }

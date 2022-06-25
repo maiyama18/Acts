@@ -44,6 +44,9 @@ struct RepositoryListScreen: View {
             }
         }
         .listStyle(.plain)
+        .refreshable {
+            await viewModel.onPullToRefreshed()
+        }
         .progressHUD(showing: viewModel.showingHUD)
     }
 }
