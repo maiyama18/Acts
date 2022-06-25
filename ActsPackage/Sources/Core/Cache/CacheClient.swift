@@ -24,6 +24,10 @@ public class CacheClient: CacheClientProtocol {
 
     public func saveGitHubWorkflowStepLogObject(object: GitHubWorkflowStepLogObject) {
         guard let realm = getInstance() else { return }
+        guard realm.object(ofType: GitHubWorkflowStepLogObject.self, forPrimaryKey: object.stepId) == nil else {
+            return
+        }
+
         do {
             try realm.write {
                 realm.add(object)
