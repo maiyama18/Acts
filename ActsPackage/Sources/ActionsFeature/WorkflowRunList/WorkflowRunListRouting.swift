@@ -1,14 +1,13 @@
 import GitHub
-import GitHubAPI
 import UIKit
 
 @MainActor
 public protocol WorkflowRunListRouting {
-    func pushWorkflowRunListView(from originVC: UIViewController, repository: GitHubRepositoryResponse)
+    func pushWorkflowRunListView(from originVC: UIViewController, repository: GitHubRepository)
 }
 
 public extension WorkflowRunListRouting {
-    func pushWorkflowRunListView(from originVC: UIViewController, repository: GitHubRepositoryResponse) {
+    func pushWorkflowRunListView(from originVC: UIViewController, repository: GitHubRepository) {
         let viewModel = WorkflowRunListViewModel(
             repository: repository,
             gitHubUseCase: GitHubUseCase.shared

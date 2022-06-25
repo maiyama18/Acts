@@ -2,12 +2,12 @@ import Core
 import GitHubAPI
 
 public protocol GitHubUseCaseProtocol {
-    func getRepositories() async throws -> [GitHubRepositoryResponse]
-    func getWorkflowRuns(repository: GitHubRepositoryResponse) async throws -> GitHubWorkflowRunsResponse
-    func getWorkflowJobs(workflowRun: GitHubWorkflowRunResponse) async throws -> GitHubWorkflowJobsResponse
-    func getWorkflowStepLog(step: GitHubWorkflowStepResponse, logsUrl: String, maxLines: Int) async throws -> GitHubWorkflowStepLogResponse?
-    func rerunWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws
-    func cancelWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws
+    func getRepositories() async throws -> [GitHubRepository]
+    func getWorkflowRuns(repository: GitHubRepository) async throws -> [GitHubWorkflowRun]
+    func getWorkflowJobs(run: GitHubWorkflowRun) async throws -> [GitHubWorkflowJob]
+    func getWorkflowStepLog(step: GitHubWorkflowStep, siblingSteps: [GitHubWorkflowStep], maxLines: Int) async throws -> GitHubWorkflowStepLog?
+    func rerunWorkflow(run: GitHubWorkflowRun) async throws
+    func cancelWorkflow(run: GitHubWorkflowRun) async throws
 }
 
 public final class GitHubUseCase: GitHubUseCaseProtocol {
@@ -24,45 +24,45 @@ public final class GitHubUseCase: GitHubUseCaseProtocol {
         self.cacheClient = cacheClient
     }
 
-    public func getRepositories() async throws -> [GitHubRepositoryResponse] {
-        try await apiClient.getRepositories()
+    public func getRepositories() async throws -> [GitHubRepository] {
+        let response = try await apiClient.getRepositories()
+        return response.map { GitHubRepository(response: $0) }
     }
 
-    public func getWorkflowRuns(repository: GitHubRepositoryResponse) async throws -> GitHubWorkflowRunsResponse {
-        try await apiClient.getWorkflowRuns(repository: repository)
+    public func getWorkflowRuns(repository: GitHubRepository) async throws -> [GitHubWorkflowRun] {
+        let response = try await apiClient.getWorkflowRuns(repositoryFullName: repository.fullName)
+        return response.workflowRuns.map { GitHubWorkflowRun(response: $0) }
     }
 
-    public func getWorkflowJobs(workflowRun: GitHubWorkflowRunResponse) async throws -> GitHubWorkflowJobsResponse {
-        var response = try await apiClient.getWorkflowJobs(workflowRun: workflowRun)
-        for jobIndex in response.jobs.indices {
-            for stepIndex in response.jobs[jobIndex].steps.indices {
-                response.jobs[jobIndex].steps[stepIndex].job = response.jobs[jobIndex]
-            }
-        }
-        return response
+    public func getWorkflowJobs(run: GitHubWorkflowRun) async throws -> [GitHubWorkflowJob] {
+        let response = try await apiClient.getWorkflowJobs(url: run.jobsUrl)
+        return response.jobs.map { GitHubWorkflowJob(response: $0, parentRun: run) }
     }
 
-    public func getWorkflowStepLog(step: GitHubWorkflowStepResponse, logsUrl: String, maxLines: Int) async throws -> GitHubWorkflowStepLogResponse? {
-        if let cacheObject = cacheClient.getGitHubWorkflowStepLogObject(id: step.runId) {
-            return GitHubWorkflowStepLogResponse(stepNumber: step.number, log: cacheObject.log, abbreviated: cacheObject.abbreviated)
+    public func getWorkflowStepLog(step: GitHubWorkflowStep, siblingSteps: [GitHubWorkflowStep], maxLines: Int) async throws -> GitHubWorkflowStepLog? {
+        if let cacheObject = cacheClient.getGitHubWorkflowStepLogObject(stepId: step.id) {
+            return GitHubWorkflowStepLog(cacheObject: cacheObject)
         }
 
-        let response = try await apiClient.getWorkflowJobsLog(logsUrl: logsUrl, maxLines: maxLines)
-        guard let stepLogs = response[step.job.name]?.stepLogs else { return nil }
+        let response = try await apiClient.getWorkflowJobLog(logsUrl: step.logsUrl, jobName: step.jobName)
+
+        let stepLogs: [GitHubWorkflowStepLog] = siblingSteps.compactMap { siblingStep in
+            guard let rawLog = response[siblingStep.number] else { return nil }
+            return GitHubWorkflowStepLog(stepId: siblingStep.id, rawLog: rawLog, maxLines: maxLines)
+        }
 
         for stepLog in stepLogs {
-            let runId = GitHubWorkflowStepResponse.generateRunId(jobRunId: step.job.runId, stepNumber: stepLog.stepNumber)
-            cacheClient.saveGitHubWorkflowStepLogObject(object: stepLog.toCacheObject(id: runId))
+            cacheClient.saveGitHubWorkflowStepLogObject(object: stepLog.toCacheObject())
         }
 
-        return stepLogs.first(where: { $0.stepNumber == step.number })
+        return stepLogs.first(where: { $0.stepId == step.id })
     }
 
-    public func rerunWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws {
-        try await apiClient.rerunWorkflow(workflowRun: workflowRun)
+    public func rerunWorkflow(run: GitHubWorkflowRun) async throws {
+        try await apiClient.rerunWorkflow(url: run.rerunUrl)
     }
 
-    public func cancelWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws {
-        try await apiClient.cancelWorkflow(workflowRun: workflowRun)
+    public func cancelWorkflow(run: GitHubWorkflowRun) async throws {
+        try await apiClient.cancelWorkflow(url: run.cancelUrl)
     }
 }

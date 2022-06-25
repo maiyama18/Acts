@@ -7,17 +7,16 @@ import GitHubAPI
 @MainActor
 public final class WorkflowRunListViewModel: ObservableObject {
     enum Event {
-        case showWorkflowRun(workflowRun: GitHubWorkflowRunResponse)
+        case showWorkflowRun(run: GitHubWorkflowRun)
         case unauthorized
         case showError(message: String)
     }
 
-    @Published private(set) var workflowRunCount: Int = 0
-    @Published private(set) var workflowRuns: [GitHubWorkflowRunResponse] = []
+    @Published private(set) var workflowRuns: [GitHubWorkflowRun] = []
 
     let events: AsyncChannel<Event> = .init()
 
-    private let repository: GitHubRepositoryResponse
+    private let repository: GitHubRepository
     private let gitHubUseCase: GitHubUseCaseProtocol
 
     var title: String {
@@ -25,7 +24,7 @@ public final class WorkflowRunListViewModel: ObservableObject {
     }
 
     init(
-        repository: GitHubRepositoryResponse,
+        repository: GitHubRepository,
         gitHubUseCase: GitHubUseCaseProtocol
     ) {
         self.repository = repository
@@ -34,10 +33,7 @@ public final class WorkflowRunListViewModel: ObservableObject {
 
     func onViewLoaded() async {
         do {
-            let response = try await gitHubUseCase.getWorkflowRuns(repository: repository)
-
-            workflowRunCount = response.totalCount
-            workflowRuns = response.workflowRuns
+            workflowRuns = try await gitHubUseCase.getWorkflowRuns(repository: repository)
         } catch {
             switch error {
             case GitHubAPIError.unauthorized:
@@ -50,7 +46,7 @@ public final class WorkflowRunListViewModel: ObservableObject {
         }
     }
 
-    func onWorkflowRunTapped(workflowRun: GitHubWorkflowRunResponse) async {
-        await events.send(.showWorkflowRun(workflowRun: workflowRun))
+    func onWorkflowRunTapped(run: GitHubWorkflowRun) async {
+        await events.send(.showWorkflowRun(run: run))
     }
 }

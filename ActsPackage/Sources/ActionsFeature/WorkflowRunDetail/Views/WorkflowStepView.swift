@@ -1,8 +1,8 @@
-import GitHubAPI
+import GitHub
 import SwiftUI
 
 struct WorkflowStepView: View {
-    var step: GitHubWorkflowStepResponse
+    var step: GitHubWorkflowStep
     var onTap: () async -> Void
     var onSeeEntireLogTapped: () async -> Void
 
@@ -28,7 +28,7 @@ struct WorkflowStepView: View {
                 }
                 .frame(width: 16, alignment: .leading)
 
-                step.stepStatus.iconImage()
+                step.status.iconImage()
 
                 Text(step.name)
                     .font(.callout)

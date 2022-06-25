@@ -4,11 +4,11 @@ import ZIPFoundation
 
 public protocol GitHubAPIClientProtocol {
     func getRepositories() async throws -> [GitHubRepositoryResponse]
-    func getWorkflowRuns(repository: GitHubRepositoryResponse) async throws -> GitHubWorkflowRunsResponse
-    func getWorkflowJobs(workflowRun: GitHubWorkflowRunResponse) async throws -> GitHubWorkflowJobsResponse
-    func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLogResponse]
-    func rerunWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws
-    func cancelWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws
+    func getWorkflowRuns(repositoryFullName: String) async throws -> GitHubWorkflowRunsResponse
+    func getWorkflowJobs(url: String) async throws -> GitHubWorkflowJobsResponse
+    func getWorkflowJobLog(logsUrl: String, jobName: String) async throws -> [Int: String]
+    func rerunWorkflow(url: String) async throws
+    func cancelWorkflow(url: String) async throws
 }
 
 public final class GitHubAPIClient: GitHubAPIClientProtocol {
@@ -47,15 +47,15 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         try await request(urlString: "https://api.github.com/user/repos?sort=updated_at", method: "GET")
     }
 
-    public func getWorkflowRuns(repository: GitHubRepositoryResponse) async throws -> GitHubWorkflowRunsResponse {
-        try await request(urlString: "https://api.github.com/repos/\(repository.owner.login)/\(repository.name)/actions/runs", method: "GET")
+    public func getWorkflowRuns(repositoryFullName: String) async throws -> GitHubWorkflowRunsResponse {
+        try await request(urlString: "https://api.github.com/repos/\(repositoryFullName)/actions/runs", method: "GET")
     }
 
-    public func getWorkflowJobs(workflowRun: GitHubWorkflowRunResponse) async throws -> GitHubWorkflowJobsResponse {
-        try await request(urlString: workflowRun.jobsUrl, method: "GET")
+    public func getWorkflowJobs(url: String) async throws -> GitHubWorkflowJobsResponse {
+        try await request(urlString: url, method: "GET")
     }
 
-    public func getWorkflowJobsLog(logsUrl: String, maxLines: Int) async throws -> [String: GitHubWorkflowJobLogResponse] {
+    public func getWorkflowJobLog(logsUrl: String, jobName: String) async throws -> [Int: String] {
         let zipFileURL = try await download(urlString: logsUrl)
         let destinationDirectoryURL = URL(
             fileURLWithPath: NSTemporaryDirectory().appending("logs-\(Date().timeIntervalSince1970)"),
@@ -69,65 +69,37 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
         )
         try fileManager.unzipItem(at: zipFileURL, to: destinationDirectoryURL)
 
-        var jobLogs: [String: GitHubWorkflowJobLogResponse] = [:]
-        for jobDirectory in try fileManager.subDirectoriesOfDirectory(at: destinationDirectoryURL) {
-            let jobName = jobDirectory.lastPathComponent
-            let stepLogFiles = try fileManager.contentsOfDirectory(
-                at: jobDirectory,
-                includingPropertiesForKeys: nil
-            )
-
-            var stepLogs: [GitHubWorkflowStepLogResponse] = []
-            for stepLogFile in stepLogFiles {
-                guard let stepNumberString = stepLogFile.lastPathComponent.split(separator: "_").first,
-                      let stepNumber = Int(stepNumberString)
-                else {
-                    logger.notice("Failed to parse step number for file \(stepLogFile.absoluteString, privacy: .public)")
-                    throw GitHubAPIError.unexpectedError
-                }
-
-                do {
-                    let logData = try Data(contentsOf: stepLogFile)
-                    guard let log = String(data: logData, encoding: .utf8) else {
-                        throw GitHubAPIError.unexpectedError
-                    }
-
-                    let lines = log.reduce(into: 0) { count, letter in
-                        if letter == "\r\n" { count += 1 }
-                    }
-
-                    let processedLog = log
-                        .split(separator: "\r\n")
-                        .suffix(100)
-                        .map { line -> String in
-                            let components = line.split(separator: " ")
-                            if components.count <= 1 {
-                                return String(line)
-                            } else {
-                                return components.dropFirst().joined(separator: " ")
-                            }
-                        }
-                        .joined(separator: "\r\n")
-                        .replacingOccurrences(of: "##[group]", with: "> ")
-                        .replacingOccurrences(of: "##[endgroup]", with: "")
-
-                    stepLogs.append(.init(stepNumber: stepNumber, log: processedLog, abbreviated: lines > maxLines))
-                } catch {
-                    logger.notice("Failed to read file \(stepLogFile.absoluteString, privacy: .public)")
-                    throw GitHubAPIError.unexpectedError
-                }
+        let jobLogsURL = destinationDirectoryURL.appendingPathComponent(jobName)
+        var stepLogs: [Int: String] = [:]
+        for stepLogFile in try fileManager.contentsOfDirectory(at: jobLogsURL, includingPropertiesForKeys: nil) {
+            guard let stepNumberString = stepLogFile.lastPathComponent.split(separator: "_").first,
+                  let stepNumber = Int(stepNumberString)
+            else {
+                logger.notice("Failed to parse step number for file \(stepLogFile.absoluteString, privacy: .public)")
+                continue
             }
-            jobLogs[jobName] = GitHubWorkflowJobLogResponse(stepLogs: stepLogs)
+
+            do {
+                let logData = try Data(contentsOf: stepLogFile)
+                guard let log = String(data: logData, encoding: .utf8) else {
+                    throw GitHubAPIError.unexpectedError
+                }
+
+                stepLogs[stepNumber] = log
+            } catch {
+                logger.notice("Failed to read file \(stepLogFile.absoluteString, privacy: .public)")
+                throw GitHubAPIError.unexpectedError
+            }
         }
-        return jobLogs
+        return stepLogs
     }
 
-    public func rerunWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws {
-        try await complete(urlString: workflowRun.rerunUrl, method: "POST")
+    public func rerunWorkflow(url: String) async throws {
+        try await complete(urlString: url, method: "POST")
     }
 
-    public func cancelWorkflow(workflowRun: GitHubWorkflowRunResponse) async throws {
-        try await complete(urlString: workflowRun.cancelUrl, method: "POST")
+    public func cancelWorkflow(url: String) async throws {
+        try await complete(urlString: url, method: "POST")
     }
 
     private func request<R: Codable>(urlString: String, method: String) async throws -> R {

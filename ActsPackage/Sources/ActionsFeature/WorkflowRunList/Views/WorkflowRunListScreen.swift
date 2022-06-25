@@ -7,15 +7,15 @@ struct WorkflowRunListView: View {
         List {
             ForEach(viewModel.workflowRuns) { workflowRun in
                 VStack(alignment: .leading) {
-                    Text(workflowRun.name)
-                    Text(workflowRun.runStatus.formatted())
+                    Text(workflowRun.title)
+                    Text(workflowRun.status.formatted())
                     Text(workflowRun.createdAt.formatted())
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     Task {
-                        await viewModel.onWorkflowRunTapped(workflowRun: workflowRun)
+                        await viewModel.onWorkflowRunTapped(run: workflowRun)
                     }
                 }
             }

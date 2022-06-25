@@ -2,18 +2,16 @@ import Foundation
 import RealmSwift
 
 public class GitHubWorkflowStepLogObject: Object {
-    @Persisted(primaryKey: true) public var id: String
-    @Persisted public var stepNumber: Int
-    @Persisted public var log: String
+    @Persisted(primaryKey: true) public var stepId: String
+    @Persisted public var processedLog: String
     @Persisted public var abbreviated: Bool
     @Persisted public var createdAt: Date
 
-    public convenience init(id: String, stepNumber: Int, log: String, abbreviated: Bool, createdAt: Date = Date()) {
+    public convenience init(stepId: String, processedLog: String, abbreviated: Bool, createdAt: Date = Date()) {
         self.init()
 
-        self.id = id
-        self.stepNumber = stepNumber
-        self.log = log
+        self.stepId = stepId
+        self.processedLog = processedLog
         self.abbreviated = abbreviated
         self.createdAt = createdAt
     }

@@ -2,7 +2,7 @@ import Foundation
 import RealmSwift
 
 public protocol CacheClientProtocol {
-    func getGitHubWorkflowStepLogObject(id: String) -> GitHubWorkflowStepLogObject?
+    func getGitHubWorkflowStepLogObject(stepId: String) -> GitHubWorkflowStepLogObject?
     func saveGitHubWorkflowStepLogObject(object: GitHubWorkflowStepLogObject)
     func deletePreviousDaysGitHubWorkflowStepLogObjects()
 }
@@ -12,8 +12,8 @@ public class CacheClient: CacheClientProtocol {
 
     private init() {}
 
-    public func getGitHubWorkflowStepLogObject(id: String) -> GitHubWorkflowStepLogObject? {
-        getInstance()?.object(ofType: GitHubWorkflowStepLogObject.self, forPrimaryKey: id)
+    public func getGitHubWorkflowStepLogObject(stepId: String) -> GitHubWorkflowStepLogObject? {
+        getInstance()?.object(ofType: GitHubWorkflowStepLogObject.self, forPrimaryKey: stepId)
     }
 
     public func saveGitHubWorkflowStepLogObject(object: GitHubWorkflowStepLogObject) {

@@ -2,7 +2,6 @@ import ActionsFeature
 import AuthAPI
 import Core
 import GitHub
-import GitHubAPI
 import SignInFeature
 import UIKit
 
