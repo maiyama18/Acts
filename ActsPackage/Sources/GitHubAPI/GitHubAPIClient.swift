@@ -73,6 +73,9 @@ public final class GitHubAPIClient: GitHubAPIClientProtocol {
             withIntermediateDirectories: true
         )
         try fileManager.unzipItem(at: zipFileURL, to: destinationDirectoryURL)
+        defer {
+            try? fileManager.removeItem(at: destinationDirectoryURL)
+        }
 
         let jobLogsURL = destinationDirectoryURL.appendingPathComponent(jobName)
         var stepLogs: [Int: String] = [:]
