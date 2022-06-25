@@ -22,7 +22,9 @@ struct RepositoryListScreen: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } header: {
-                Text("Favorite")
+                if !viewModel.favoriteRepositories.isEmpty {
+                    Text("Favorite")
+                }
             }
 
             Section {
@@ -40,7 +42,9 @@ struct RepositoryListScreen: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } header: {
-                Text("Your's")
+                if !viewModel.usersRepositories.isEmpty {
+                    Text("Your's")
+                }
             }
         }
         .listStyle(.plain)
