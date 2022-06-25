@@ -8,15 +8,36 @@ struct RepositoryListScreen: View {
     var body: some View {
         List {
             Section {
-                ForEach(viewModel.repositories) { repository in
-                    RepositoryView(repository: repository)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            Task {
-                                await viewModel.onRepositoryTapped(repository: repository)
-                            }
+                ForEach(viewModel.favoriteRepositories) { repository in
+                    RepositoryView(
+                        repository: repository,
+                        favorited: true,
+                        onTapped: {
+                            Task { await viewModel.onRepositoryTapped(repository: repository) }
+                        },
+                        onFavoriteButtonTapped: {
+                            Task { await viewModel.onUnFavorited(repository: repository) }
                         }
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            } header: {
+                Text("Favorite")
+            }
+
+            Section {
+                ForEach(viewModel.usersRepositories) { repository in
+                    RepositoryView(
+                        repository: repository,
+                        favorited: false,
+                        onTapped: {
+                            Task { await viewModel.onRepositoryTapped(repository: repository) }
+                        },
+                        onFavoriteButtonTapped: {
+                            Task { await viewModel.onFavorited(repository: repository) }
+                        }
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } header: {
                 Text("Your's")

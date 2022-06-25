@@ -3,6 +3,7 @@ import Combine
 import Core
 import GitHub
 import GitHubAPI
+import SwiftUI
 
 @MainActor
 public final class RepositoryListViewModel: ObservableObject {
@@ -13,7 +14,8 @@ public final class RepositoryListViewModel: ObservableObject {
         case showError(message: String)
     }
 
-    @Published private(set) var repositories: [GitHubRepository] = []
+    @Published private(set) var favoriteRepositories: [GitHubRepository] = []
+    @Published private(set) var usersRepositories: [GitHubRepository] = []
     @Published private(set) var showingHUD: Bool = false
 
     let events: AsyncChannel<Event> = .init()
@@ -32,7 +34,9 @@ public final class RepositoryListViewModel: ObservableObject {
             showingHUD = false
         }
         do {
-            repositories = try await gitHubUseCase.getRepositories()
+            let repositories = try await gitHubUseCase.getRepositories()
+            favoriteRepositories = repositories.favoriteRepositories
+            usersRepositories = repositories.usersRepositories
         } catch {
             switch error {
             case GitHubAPIError.unauthorized:
@@ -53,5 +57,28 @@ public final class RepositoryListViewModel: ObservableObject {
 
     func onSettingsButtonTapped() async {
         await events.send(.showSettings)
+    }
+
+    func onFavorited(repository: GitHubRepository) async {
+        do {
+            try cacheClient.saveFavoriteGitHubRepository(object: repository.toObject())
+            withAnimation {
+                favoriteRepositories.append(repository)
+                usersRepositories.removeAll(where: { $0.id == repository.id })
+            }
+        } catch {
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+        }
+    }
+
+    func onUnFavorited(repository: GitHubRepository) async {
+        do {
+            try cacheClient.deleteFavoriteGitHubRepository(id: repository.id)
+            withAnimation {
+                favoriteRepositories.removeAll(where: { $0.id == repository.id })
+            }
+        } catch {
+            await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
+        }
     }
 }
