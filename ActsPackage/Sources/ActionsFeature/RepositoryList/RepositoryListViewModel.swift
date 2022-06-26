@@ -17,6 +17,9 @@ public final class RepositoryListViewModel: ObservableObject {
     @Published private(set) var favoriteRepositories: [GitHubRepository] = []
     @Published private(set) var usersRepositories: [GitHubRepository] = []
     @Published private(set) var showingHUD: Bool = false
+    @Published private(set) var loadingMore: Bool = false
+    @Published private(set) var hasMoreUsersRepositories: Bool = false
+    @Published private(set) var usersRepositoriesPage: Int = 0
 
     let events: AsyncChannel<Event> = .init()
 
@@ -34,9 +37,11 @@ public final class RepositoryListViewModel: ObservableObject {
             showingHUD = false
         }
         do {
-            let repositories = try await gitHubUseCase.getRepositories()
+            usersRepositoriesPage = 1
+            let repositories = try await gitHubUseCase.getRepositories(page: usersRepositoriesPage)
             favoriteRepositories = repositories.favoriteRepositories
             usersRepositories = repositories.usersRepositories
+            hasMoreUsersRepositories = repositories.hasMoreUsersRepositories
         } catch {
             await handleGitHubError(error: error)
         }
@@ -46,9 +51,26 @@ public final class RepositoryListViewModel: ObservableObject {
 
     func onPullToRefreshed() async {
         do {
-            let repositories = try await gitHubUseCase.getRepositories()
+            usersRepositoriesPage = 1
+            let repositories = try await gitHubUseCase.getRepositories(page: usersRepositoriesPage)
             favoriteRepositories = repositories.favoriteRepositories
             usersRepositories = repositories.usersRepositories
+            hasMoreUsersRepositories = repositories.hasMoreUsersRepositories
+        } catch {
+            await handleGitHubError(error: error)
+        }
+    }
+
+    func onLoadMoreUsersRepositoriesTapped() async {
+        loadingMore = true
+        defer {
+            loadingMore = false
+        }
+        do {
+            usersRepositoriesPage += 1
+            let repositories = try await gitHubUseCase.getRepositories(page: usersRepositoriesPage)
+            usersRepositories += repositories.usersRepositories
+            hasMoreUsersRepositories = repositories.hasMoreUsersRepositories
         } catch {
             await handleGitHubError(error: error)
         }

@@ -46,6 +46,27 @@ struct RepositoryListScreen: View {
                     Text("Your's")
                 }
             }
+
+            if viewModel.hasMoreUsersRepositories {
+                Button(action: {
+                    Task {
+                        await viewModel.onLoadMoreUsersRepositoriesTapped()
+                    }
+                }) {
+                    Group {
+                        if viewModel.loadingMore {
+                            ProgressView()
+                        } else {
+                            Text("Load more")
+                                .foregroundColor(.accentColor)
+                                .bold()
+                        }
+                    }
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                }
+                .buttonStyle(.plain)
+            }
         }
         .listStyle(.plain)
         .refreshable {
