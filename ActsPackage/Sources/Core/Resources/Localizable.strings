@@ -17,4 +17,8 @@
 
 "actions_feature.workflow_run_list.empty_message" = "No workflow runs";
 
+"settings_feature.title.settings" = "Settings";
+
+"settings_feature.about_app" = "About App";
+"settings_feature.version_key" = "Version";
 "settings_feature.sign_out_from_github" = "Sign Out";

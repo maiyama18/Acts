@@ -1,6 +1,7 @@
 import AsyncAlgorithms
 import Combine
 import Core
+import Foundation
 
 final class SettingsViewModel: ObservableObject {
     enum Event: Equatable {
@@ -14,6 +15,10 @@ final class SettingsViewModel: ObservableObject {
 
     init(secureStorage: SecureStorageProtocol) {
         self.secureStorage = secureStorage
+    }
+
+    var versionString: String {
+        Bundle.main.appVersion
     }
 
     func onSignOutButtonTapped() async {

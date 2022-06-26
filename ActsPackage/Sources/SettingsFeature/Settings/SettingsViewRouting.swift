@@ -6,7 +6,7 @@ public protocol SettingsViewRouting {
 
 public extension SettingsViewRouting {
     func presentSettingsView(from originVC: UIViewController) {
-        let destinationVC = SettingsViewController()
+        let destinationVC = UINavigationController(rootViewController: SettingsViewController())
         originVC.present(destinationVC, animated: true)
     }
 }

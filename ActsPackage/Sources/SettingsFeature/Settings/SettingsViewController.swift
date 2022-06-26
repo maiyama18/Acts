@@ -23,8 +23,14 @@ public final class SettingsViewController: UIViewController {
     override public func viewDidLoad() {
         super.viewDidLoad()
 
+        setupNavigation()
+
         subscribe()
         hostSwiftUIView(SettingsScreen(viewModel: viewModel))
+    }
+
+    private func setupNavigation() {
+        navigationItem.title = L10n.SettingsFeature.Title.settings
     }
 
     private func subscribe() {
