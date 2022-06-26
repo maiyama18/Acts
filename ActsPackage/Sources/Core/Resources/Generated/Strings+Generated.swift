@@ -53,8 +53,16 @@ public enum L10n {
   }
 
   public enum SettingsFeature {
+    /// About App
+    public static let aboutApp = L10n.tr("Localizable", "settings_feature.about_app")
     /// Sign Out
     public static let signOutFromGithub = L10n.tr("Localizable", "settings_feature.sign_out_from_github")
+    /// Version
+    public static let versionKey = L10n.tr("Localizable", "settings_feature.version_key")
+    public enum Title {
+      /// Settings
+      public static let settings = L10n.tr("Localizable", "settings_feature.title.settings")
+    }
   }
 
   public enum SignInFeature {

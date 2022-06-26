@@ -11,7 +11,7 @@ struct WorkflowStepView: View {
     @Namespace private var scrollingTextID
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 4) {
                 Group {
                     switch step.log {
@@ -31,7 +31,7 @@ struct WorkflowStepView: View {
                 step.status.iconImage()
 
                 Text(step.name)
-                    .font(.callout)
+                    .font(.avenirCallout)
 
                 Spacer()
 
@@ -61,7 +61,7 @@ struct WorkflowStepView: View {
                                     }
                                 }
                         }
-                        .font(.caption.bold())
+                        .font(.avenirCaption.weight(.semibold))
                         .foregroundColor(.orange)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)

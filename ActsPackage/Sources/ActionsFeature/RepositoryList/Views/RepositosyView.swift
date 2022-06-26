@@ -22,11 +22,11 @@ struct RepositoryView: View {
 
             VStack(alignment: .leading) {
                 Text(repository.owner.login)
-                    .font(.caption)
+                    .font(.avenirCaption)
                     .foregroundStyle(.secondary)
 
                 Text(repository.name)
-                    .font(.callout.bold())
+                    .font(.avenirCallout.weight(.semibold))
             }
 
             Spacer()

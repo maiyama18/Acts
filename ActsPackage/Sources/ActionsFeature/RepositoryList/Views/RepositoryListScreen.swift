@@ -24,6 +24,7 @@ struct RepositoryListScreen: View {
             } header: {
                 if !viewModel.favoriteRepositories.isEmpty {
                     Text("Favorite")
+                        .font(.avenirCallout.weight(.semibold))
                 }
             }
 
@@ -44,6 +45,7 @@ struct RepositoryListScreen: View {
             } header: {
                 if !viewModel.usersRepositories.isEmpty {
                     Text("Your's")
+                        .font(.avenirCallout.weight(.semibold))
                 }
             }
 
@@ -62,7 +64,7 @@ struct RepositoryListScreen: View {
                                 .bold()
                         }
                     }
-                    .font(.callout)
+                    .font(.avenirCallout)
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .buttonStyle(.plain)
