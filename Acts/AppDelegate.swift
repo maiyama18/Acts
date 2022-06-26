@@ -11,6 +11,7 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        setupNavigationAppearance()
         setupHUD()
         return true
     }
@@ -25,5 +26,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func setupHUD() {
         PKHUD.sharedHUD.gracePeriod = 0.3
+    }
+
+    private func setupNavigationAppearance() {
+        UIBarButtonItem.appearance().setTitleTextAttributes(
+            [
+                NSAttributedString.Key.font: UIFont(name: "AvenirNext-Regular", size: 16)!,
+            ], for: .normal
+        )
     }
 }

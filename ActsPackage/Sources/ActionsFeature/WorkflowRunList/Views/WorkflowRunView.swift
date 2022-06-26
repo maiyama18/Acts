@@ -12,15 +12,15 @@ struct WorkflowRunView: View {
                         .font(.title2)
 
                     Text(run.title)
-                        .font(.body.bold())
+                        .font(.avenirBody.weight(.semibold))
                 }
 
                 Text(run.headCommitMessage)
-                    .font(.caption)
+                    .font(.avenirCaption)
                     .lineLimit(1)
 
                 Text(run.formattedRunStatusWithTime)
-                    .font(.caption)
+                    .font(.avenirCaption)
                     .foregroundStyle(.secondary)
             }
 

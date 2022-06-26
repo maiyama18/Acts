@@ -23,7 +23,7 @@ struct SignInScreen: View {
                 }
             }) {
                 Text(L10n.SignInFeature.signInWithGithub)
-                    .font(.body.bold())
+                    .font(.avenirBody.weight(.semibold))
                     .foregroundStyle(Color(uiColor: .systemBackground))
                     .frame(maxWidth: .infinity)
                     .padding()

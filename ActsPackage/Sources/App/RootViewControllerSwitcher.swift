@@ -26,7 +26,11 @@ public final class RootViewControllerSwitcher {
                 gitHubUseCase: GitHubUseCase.shared,
                 cacheClient: CacheClient.shared
             )
-            window.rootViewController = UINavigationController(rootViewController: RepositoryListViewController(viewModel: viewModel))
+            let rootViewController = UINavigationController(rootViewController: RepositoryListViewController(viewModel: viewModel))
+            rootViewController.navigationBar.titleTextAttributes = [
+                NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 18)!,
+            ]
+            window.rootViewController = rootViewController
         } else {
             let viewModel = SignInViewModel(
                 authAPIClient: AuthAPIClient.shared,

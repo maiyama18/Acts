@@ -9,7 +9,7 @@ struct SettingsScreen: View {
             Section(content: {
                 HStack {
                     Text(L10n.SettingsFeature.versionKey)
-                        .font(.callout)
+                        .font(.avenirCallout)
 
                     Spacer()
 
@@ -19,6 +19,7 @@ struct SettingsScreen: View {
                 }
             }, header: {
                 Text(L10n.SettingsFeature.aboutApp)
+                    .font(.avenirCaption.weight(.semibold))
             })
 
             Section(content: {
@@ -28,7 +29,7 @@ struct SettingsScreen: View {
                     }
                 }) {
                     Text(L10n.SettingsFeature.signOutFromGithub)
-                        .font(.callout.bold())
+                        .font(.avenirCallout.weight(.semibold))
                         .foregroundColor(.red)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }

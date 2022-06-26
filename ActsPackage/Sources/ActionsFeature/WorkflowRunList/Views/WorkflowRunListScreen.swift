@@ -13,7 +13,7 @@ struct WorkflowRunListView: View {
                         .font(.system(size: 64))
 
                     Text(L10n.ActionsFeature.WorkflowRunList.emptyMessage)
-                        .font(.title2.bold())
+                        .font(.avenirTitle2.weight(.semibold))
                 }
                 .foregroundStyle(.secondary)
             } else {

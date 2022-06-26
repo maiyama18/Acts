@@ -6,18 +6,17 @@ struct WorkflowRunDetailScreen: View {
     var body: some View {
         List {
             ForEach(viewModel.workflowJobs) { workflowJob in
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 2) {
                     HStack {
                         workflowJob.status.iconImage()
                             .font(.title)
 
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 0) {
                             Text(workflowJob.name)
-                                .font(.title2.bold())
-                                .bold()
+                                .font(.avenirTitle2.weight(.semibold))
 
                             Text(workflowJob.formattedJobStatusWithTime)
-                                .font(.subheadline)
+                                .font(.avenirCaption)
                                 .foregroundStyle(.secondary)
                         }
 
