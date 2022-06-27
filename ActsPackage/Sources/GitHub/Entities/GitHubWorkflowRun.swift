@@ -57,6 +57,12 @@ public struct GitHubWorkflowRun: Identifiable {
             } else {
                 return "Failed"
             }
+        case .startupFailed:
+            if let updatedAt = updatedAt {
+                return "Startup failed at \(updatedAt.dateTimeFormatted())"
+            } else {
+                return "Startup failed"
+            }
         case .cancelled:
             if let updatedAt = updatedAt {
                 return "Cancelled at \(updatedAt.dateTimeFormatted())"
