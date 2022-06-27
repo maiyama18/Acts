@@ -17,6 +17,7 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     }
 
     @Published private(set) var workflowJobs: [GitHubWorkflowJob] = []
+    @Published private(set) var showingHUD: Bool = false
 
     let events: AsyncChannel<Event> = .init()
 
@@ -45,6 +46,11 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
     }
 
     func onViewLoaded() async {
+        showingHUD = true
+        defer {
+            showingHUD = false
+        }
+
         do {
             workflowJobs = try await gitHubUseCase.getWorkflowJobs(run: workflowRun)
         } catch {
@@ -117,6 +123,11 @@ public final class WorkflowRunDetailViewModel: ObservableObject {
 
     func onSeeEntireLogTapped(job: GitHubWorkflowJob) async {
         guard let url = URL(string: job.htmlUrl) else { return }
+        await events.send(.openOnBrowser(url: url))
+    }
+
+    func onOpenWorkflowRunOnBrowserTapped() async {
+        guard let url = URL(string: workflowRun.htmlUrl) else { return }
         await events.send(.openOnBrowser(url: url))
     }
 

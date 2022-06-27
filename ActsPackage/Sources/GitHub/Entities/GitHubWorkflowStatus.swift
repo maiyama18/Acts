@@ -38,7 +38,7 @@ public enum GitHubWorkflowStatus {
             self = .other(raw: rawStatus)
         }
     }
-    
+
     @ViewBuilder
     public func iconImage() -> some View {
         switch self {

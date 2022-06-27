@@ -9,6 +9,7 @@ public struct GitHubWorkflowRun: Identifiable {
     public var headCommitMessage: String
     public var createdAt: Date
     public var updatedAt: Date?
+    public var htmlUrl: String
     public var jobsUrl: String
     public var logsUrl: String
     public var rerunUrl: String
@@ -23,6 +24,7 @@ public struct GitHubWorkflowRun: Identifiable {
         headCommitMessage = response.headCommit.message
         createdAt = response.createdAt
         updatedAt = response.updatedAt
+        htmlUrl = response.htmlUrl
         jobsUrl = response.jobsUrl
         logsUrl = response.logsUrl
         rerunUrl = response.rerunUrl

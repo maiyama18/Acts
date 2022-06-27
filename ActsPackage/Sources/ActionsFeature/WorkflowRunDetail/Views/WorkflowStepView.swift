@@ -1,3 +1,4 @@
+import Core
 import GitHub
 import SwiftUI
 
@@ -51,9 +52,9 @@ struct WorkflowStepView: View {
                 VStack(spacing: 0) {
                     if abbreviated {
                         HStack {
-                            Text("This log is too long.")
+                            Text(L10n.ActionsFeature.WorkflowRunDetail.tooLongLogMessage)
 
-                            Text("See entire log on web")
+                            Text(L10n.ActionsFeature.WorkflowRunDetail.tooLongLogLinkText)
                                 .underline()
                                 .onTapGesture {
                                     Task {
