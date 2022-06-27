@@ -101,6 +101,7 @@ public final class RepositoryListViewModel: ObservableObject {
             try cacheClient.deleteFavoriteGitHubRepository(id: repository.id)
             withAnimation {
                 favoriteRepositories.removeAll(where: { $0.id == repository.id })
+                usersRepositories.insert(repository, at: 0)
             }
         } catch {
             await events.send(.showError(message: L10n.ErrorMessage.unexpectedError))
