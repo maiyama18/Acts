@@ -5,6 +5,7 @@ public enum GitHubWorkflowStatus {
     case inProgress
     case succeeded
     case failed
+    case startupFailed
     case cancelled
     case skipped
     case timedOut
@@ -22,6 +23,8 @@ public enum GitHubWorkflowStatus {
                 self = .cancelled
             case "failure":
                 self = .failed
+            case "startup_failure":
+                self = .startupFailed
             case "success":
                 self = .succeeded
             case "skipped":
@@ -36,27 +39,6 @@ public enum GitHubWorkflowStatus {
         }
     }
 
-    public func formatted() -> String {
-        switch self {
-        case .queued:
-            return "Queued"
-        case .inProgress:
-            return "InProgress"
-        case .succeeded:
-            return "Succeeded"
-        case .failed:
-            return "Failed"
-        case .cancelled:
-            return "Cancelled"
-        case .skipped:
-            return "Skipped"
-        case .timedOut:
-            return "TimedOut"
-        case let .other(raw):
-            return raw
-        }
-    }
-
     @ViewBuilder
     public func iconImage() -> some View {
         switch self {
@@ -68,7 +50,7 @@ public enum GitHubWorkflowStatus {
                 .rotateForever()
         case .succeeded:
             Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
-        case .failed, .timedOut:
+        case .failed, .startupFailed, .timedOut:
             Image(systemName: "xmark.circle.fill").foregroundColor(.red)
         case .skipped:
             Image(systemName: "slash.circle.fill").foregroundColor(.gray)

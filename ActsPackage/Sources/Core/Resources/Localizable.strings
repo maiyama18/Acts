@@ -15,7 +15,14 @@
 "actions_feature.message.workflow_request_sent" = "%@ request successfully sent";
 "actions_feature.message.in_progress_log_unavailable" = "Log is unavailable while the workflow is in progress";
 
+"actions_feature.repository_list.empty_message" = "No repositories found";
+
 "actions_feature.workflow_run_list.empty_message" = "No workflow runs";
+
+"actions_feature.workflow_run_detail.empty_message" = "No jobs found";
+"actions_feature.workflow_run_detail.empty_link_text" = "Open on browser";
+"actions_feature.workflow_run_detail.too_long_log_message" = "This log is too long.";
+"actions_feature.workflow_run_detail.too_long_log_link_text" = "See entire log on web";
 
 "settings_feature.title.settings" = "Settings";
 

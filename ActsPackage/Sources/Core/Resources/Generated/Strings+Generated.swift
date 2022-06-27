@@ -20,9 +20,23 @@ public enum L10n {
         return L10n.tr("Localizable", "actions_feature.message.workflow_request_sent", String(describing: p1))
       }
     }
+    public enum RepositoryList {
+      /// No repositories found
+      public static let emptyMessage = L10n.tr("Localizable", "actions_feature.repository_list.empty_message")
+    }
     public enum Title {
       /// Repositories
       public static let repositoryList = L10n.tr("Localizable", "actions_feature.title.repository_list")
+    }
+    public enum WorkflowRunDetail {
+      /// Open on browser
+      public static let emptyLinkText = L10n.tr("Localizable", "actions_feature.workflow_run_detail.empty_link_text")
+      /// No jobs found
+      public static let emptyMessage = L10n.tr("Localizable", "actions_feature.workflow_run_detail.empty_message")
+      /// See entire log on web
+      public static let tooLongLogLinkText = L10n.tr("Localizable", "actions_feature.workflow_run_detail.too_long_log_link_text")
+      /// This log is too long.
+      public static let tooLongLogMessage = L10n.tr("Localizable", "actions_feature.workflow_run_detail.too_long_log_message")
     }
     public enum WorkflowRunList {
       /// No workflow runs

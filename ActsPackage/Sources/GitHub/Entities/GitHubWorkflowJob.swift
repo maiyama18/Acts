@@ -52,6 +52,12 @@ public struct GitHubWorkflowJob: Identifiable {
             } else {
                 return "Failed"
             }
+        case .startupFailed:
+            if let completedAt = completedAt {
+                return "Startup failed at \(completedAt.dateTimeFormatted())"
+            } else {
+                return "Startup failed"
+            }
         case .cancelled:
             if let completedAt = completedAt {
                 return "Cancelled at \(completedAt.dateTimeFormatted())"

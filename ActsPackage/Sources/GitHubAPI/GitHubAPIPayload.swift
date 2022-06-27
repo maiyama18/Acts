@@ -21,6 +21,7 @@ public struct GitHubWorkflowRunResponse: Codable, Identifiable {
     public var actor: GitHubUserResponse
     public var createdAt: Date
     public var updatedAt: Date
+    public var htmlUrl: String
     public var jobsUrl: String
     public var logsUrl: String
     public var rerunUrl: String
