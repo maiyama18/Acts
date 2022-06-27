@@ -20,6 +20,10 @@ public enum L10n {
         return L10n.tr("Localizable", "actions_feature.message.workflow_request_sent", String(describing: p1))
       }
     }
+    public enum RepositoryList {
+      /// No repositories found
+      public static let emptyMessage = L10n.tr("Localizable", "actions_feature.repository_list.empty_message")
+    }
     public enum Title {
       /// Repositories
       public static let repositoryList = L10n.tr("Localizable", "actions_feature.title.repository_list")
